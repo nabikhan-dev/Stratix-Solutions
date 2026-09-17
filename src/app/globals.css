@@ -1,0 +1,330 @@
+@import "tailwindcss";
+
+:root {
+  /* Backgrounds — Background Light / Surface / Card / Background Dark */
+  --bg-void: #F8FAFC;
+  --bg-deep: #EEF2F7;
+  --bg-surface: #FFFFFF;
+  --bg-glass: rgba(10, 25, 47, 0.05);
+  --bg-dark: #000;
+
+  /* Border */
+  --line: #E2E8F0;
+  --line-strong: #CBD5E1;
+  --line-hair: rgba(15, 23, 42, 0.07); /* lower-opacity hairline for dense rows/tables on light surfaces */
+
+  /* Text Primary / Text Secondary */
+  --text-primary: #111827;
+  --text-muted: #64748B;
+  --text-faint: #94A3B8;
+
+  /* Primary (brand navy) */
+  --brand: #0A192F;
+
+  /* Secondary + its hover */
+  --signal: #7C3AED;
+  --signal-soft: rgba(124, 58, 237, 0.16);
+  --signal-hover: #6D28D9;
+
+  /* Accent + its hover */
+  --aurora: #00D4FF;
+  --aurora-soft: rgba(0, 212, 255, 0.16);
+  --aurora-hover: #00B8E6;
+
+  /* Warning / Success / Error */
+  --amber: #F59E0B;
+  --amber-soft: rgba(245, 158, 11, 0.16);
+  --calm: #22C55E;
+  --danger: #EF4444;
+
+  --font-display: "Geist Mono", "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "DM Mono", "JetBrains Mono", ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-void: var(--bg-void);
+  --color-deep: var(--bg-deep);
+  --color-surface: var(--bg-surface);
+  --color-dark: var(--bg-dark);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-line-hair: var(--line-hair);
+
+  --color-primary: var(--text-primary);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+
+  --color-brand: var(--brand);
+  --color-signal: var(--signal);
+  --color-signal-hover: var(--signal-hover);
+  --color-aurora: var(--aurora);
+  --color-aurora-hover: var(--aurora-hover);
+  --color-amber: var(--amber);
+  --color-calm: var(--calm);
+  --color-danger: var(--danger);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-void);
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  display: none;
+}
+
+body::after {
+  display: none;
+}
+
+/* Toggled by AmbientGlowControl on routes that don't want the corner glow. */
+body.no-ambient-glow::before {
+  display: none;
+}
+
+main {
+  position: relative;
+  z-index: 2;
+}
+
+::selection {
+  background: var(--signal);
+  color: #ffffff;
+}
+
+@layer base {
+  a {
+    color: inherit;
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23949bb3' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.text-gradient {
+  background: linear-gradient(100deg, #f2f4fb 20%, var(--signal) 55%, var(--aurora) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.container-px {
+  padding-left: clamp(1rem, 5vw, 6rem);
+  padding-right: clamp(1rem, 5vw, 6rem);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+/* Custom cursor — four corner brackets */
+.cursor-point {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.cursor-point[data-visible="true"] {
+  opacity: 1;
+}
+
+.cursor-point__corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 0 solid var(--signal);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.cursor-point__corner--tl {
+  top: 0;
+  left: 0;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+}
+
+.cursor-point__corner--tr {
+  top: 0;
+  right: 0;
+  border-top-width: 1.5px;
+  border-right-width: 1.5px;
+}
+
+.cursor-point__corner--bl {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 1.5px;
+  border-left-width: 1.5px;
+}
+
+.cursor-point__corner--br {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+}
+
+/* Locked onto an element marked with data-cursor-frame: the brackets grow
+   and the box is sized to that element's rect by Cursor.tsx. */
+.cursor-point[data-locked="true"] .cursor-point__corner {
+  width: 22px;
+  height: 22px;
+}
+
+.cursor-point__tag {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  margin: 6px 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--signal);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cursor-point[data-locked="true"] .cursor-point__tag {
+  opacity: 1;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-point {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus states */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ----------------------------------------------------------------------
+   Text roll — see TextRoll.tsx. The label sits in a mask exactly one line
+   tall and hover slides it up a whole box, the incoming copy following it
+   from below, so the words move without a single character being redrawn.
+
+   `vertical-align: bottom` is load-bearing: an inline-block that clips its
+   overflow takes its bottom edge as its baseline, so left on `baseline` the
+   label would drop by a descender and grow the button around it.
+
+   Reduced motion needs nothing here — the global rule above collapses the
+   transition, and the two copies are the same text, so the swap is invisible.
+   ---------------------------------------------------------------------- */
+.text-roll {
+  --roll-duration: 400ms;
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.text-roll__face {
+  display: block;
+  /* Ease-out-cubic — the site's one easing, see EASE in lib/motion.ts. Still
+     400ms: this is a hover, and it answers the pointer rather than arriving
+     with the page, so it stays clear of the slower scroll entrances. */
+  transition: transform var(--roll-duration) cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* The arriving copy is stacked on the leaving one and parked a full box
+   below it — a box rather than a line, so a label that wraps to two lines
+   still rolls as one piece. */
+.text-roll__face--in {
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+}
+
+/* Touch has no hover to answer, and a tap would leave the label stranded
+   half-rolled until the next one. */
+@media (hover: hover) and (pointer: fine) {
+  .text-roll--hover:hover .text-roll__face--out,
+  [data-roll-group]:hover .text-roll--group .text-roll__face--out {
+    transform: translateY(-100%);
+  }
+
+  .text-roll--hover:hover .text-roll__face--in,
+  [data-roll-group]:hover .text-roll--group .text-roll__face--in {
+    transform: translateY(0);
+  }
+}
+
