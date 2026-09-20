@@ -9,19 +9,13 @@ import { pricingFaqs } from "@/data/content";
 import { pageHeroes, sections } from "@/data/copy";
 
 export const metadata: Metadata = {
-  // `absolute` so the root layout's "%s — Stratix Solutions" template doesn't
-  // append a second brand name to a title that already carries one.
   title: { absolute: "Pricing | Fixed-Price MVP Builds — Stratix Solution" },
   description:
     "MVPs from $5k, fixed price, shipped in 2–8 weeks. Pick a plan, lock the scope on a free call, and pay for outcomes — not hours.",
   alternates: { canonical: "/pricing" },
 };
 
-/**
- * FAQPage structured data built from the same answers rendered below, so the
- * markup and the schema can never drift apart. Targets the "how much does an
- * app cost" queries this page is written for.
- */
+
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",

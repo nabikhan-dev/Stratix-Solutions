@@ -5,13 +5,6 @@ import { motion } from "framer-motion";
 import { RISE, STAGGER, VIEWPORT, enter } from "@/lib/motion";
 import { sections } from "@/data/copy";
 
-/* ─── Tech data ───
-   Every entry maps to a real file in /public/icons. Anything without an
-   icon there (Vercel, Flutter, Hugging Face, Pinecone, Kubernetes,
-   LangChain…) is intentionally absent rather than faked with an emoji.
-   `invert` is for monochrome marks drawn in near-black, which would be
-   invisible on this section's black background — they render as their
-   official white-on-dark variant instead. */
 type Tech = {
   name: string;
   icon: string;

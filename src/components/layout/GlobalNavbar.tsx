@@ -9,8 +9,7 @@ import { hero, nav } from "@/data/content";
 import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import TextRoll from "@/components/motion/TextRoll";
 
-// Runs before paint on the client so the correct logo variant is in the first
-// frame; falls back to useEffect on the server, where layout effects warn.
+
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export default function GlobalNavbar() {
@@ -166,7 +165,7 @@ export default function GlobalNavbar() {
               ))}
               <SectionCtaButton
                 href={hero.primaryCta.href}
-                size="sm"
+                size="md"
                 fullWidth
                 className="mt-2"
                 onClick={() => setMobileOpen(false)}

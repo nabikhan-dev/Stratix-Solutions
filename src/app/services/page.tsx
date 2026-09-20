@@ -3,8 +3,7 @@ import ServiceSwitcher from "@/components/services/ServiceSwitcher";
 
 import SectionHeading from "@/components/layout/SectionHeading";
 import PageHero from "@/components/layout/PageHero";
-import SectionCtaButton from "@/components/layout/SectionCtaButton";
-import Reveal from "@/components/motion/Reveal";
+import ClosingCta from "@/components/layout/ClosingCta";
 
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pageHeroes, sections } from "@/data/copy";
@@ -47,27 +46,11 @@ export default function ServicesPage() {
       </section>
 
       {/* Closing CTA */}
-      <section className="py-16 sm:py-24">
-        <div className="container-px mx-auto max-w-[1400px]">
-          <div className="glass flex flex-col items-center gap-4 rounded-3xl p-10 text-center sm:p-16">
-            <Reveal>
-              <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.03em] text-primary">
-                {sections.servicesClosingCta.title}
-              </h2>
-            </Reveal>
-            <Reveal delay={0.05}>
-              <p className="max-w-2xl text-muted text-lg">
-                {sections.servicesClosingCta.description}
-              </p>
-            </Reveal>
-            <Reveal delay={0.1} className="mt-2">
-              <SectionCtaButton href={sections.servicesClosingCta.cta.href}>
-                {sections.servicesClosingCta.cta.label}
-              </SectionCtaButton>
-            </Reveal>
-          </div>
-        </div>
-      </section>
+      <ClosingCta
+        title={sections.servicesClosingCta.title}
+        description={sections.servicesClosingCta.description}
+        cta={sections.servicesClosingCta.cta}
+      />
 
     </div>
   );

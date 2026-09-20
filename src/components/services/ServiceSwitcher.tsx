@@ -2,29 +2,28 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BrainCircuit, Paintbrush, Smartphone, Globe, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { primaryServices } from "@/data/content";
 import { DUR, RISE, VIEWPORT, enter, enterAt } from "@/lib/motion";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import {
+  MobileProgramming01Icon,
+  WebDesign02Icon,
+  BrushIcon,
+  AiNetworkIcon,
+} from "@hugeicons/core-free-icons";
 
-const icons: Record<string, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
-  ai: BrainCircuit,
-  uiux: Paintbrush,
-  app: Smartphone,
-  web: Globe,
+const icons: Record<string, IconSvgElement> = {
+  ai: AiNetworkIcon,
+  uiux: BrushIcon,
+  app: MobileProgramming01Icon,
+  web: WebDesign02Icon,
 };
 
-/**
- * Index + detail layout: a numbered list of the four disciplines on the
- * left, a detail panel on the right that swaps to show that service's full
- * description and motif tags — real hierarchy instead of four identical
- * cards, and it surfaces `description`/`motifWords` from the data that the
- * old card grid never displayed. Sits on the light band between the dark
- * hero and the dark comparison table, so it's styled light directly.
- */
 export default function ServiceSwitcher() {
   const [active, setActive] = useState(0);
   const service = primaryServices[active];
-  const Icon = icons[service.id] ?? Globe;
+  const icon = icons[service.id] ?? WebDesign02Icon;
 
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
@@ -43,13 +42,13 @@ export default function ServiceSwitcher() {
                 aria-pressed={isActive}
                 data-cursor={isActive ? "" : "Select"}
                 className={`group flex w-full items-center gap-5 border-b border-line py-5 text-left transition-colors last:border-b-0 sm:py-6 ${
-                  isActive ? "" : "hover:bg-deep/40"
+                  isActive ? "bg-[#7C3AED]/50" : "hover:bg-deep/50"
                 }`}
               >
                 <span className={`font-mono text-sm ${isActive ? "text-signal" : "text-faint"}`}>{s.number}</span>
                 <span
                   className={`flex-1 font-display text-xl font-semibold tracking-[-0.03em] transition-colors sm:text-2xl ${
-                    isActive ? "text-primary" : "text-muted group-hover:text-primary"
+                    isActive ? "text-[#fff]" : "text-muted group-hover:text-primary"
                   }`}
                 >
                   {s.title}
@@ -81,8 +80,8 @@ export default function ServiceSwitcher() {
             transition={enter(0, DUR.fast)}
             className="flex h-full flex-col rounded-2xl border border-line bg-surface p-8 sm:p-10"
           >
-            <div className="mb-7 flex h-12 w-12 items-center justify-center rounded-xl border border-line bg-void">
-              <Icon className="h-5 w-5 text-signal" strokeWidth={1.75} />
+            <div className="mb-7 flex h-12 w-12 items-center justify-center rounded-[14px] bg-signal">
+              <HugeiconsIcon icon={icon} size={22} className="text-white" strokeWidth={1.75} />
             </div>
             <h3 className="font-display text-2xl font-semibold tracking-[-0.03em] text-primary">{service.title}</h3>
             <p className="mt-4 text-[15px] leading-relaxed text-muted">{service.description}</p>

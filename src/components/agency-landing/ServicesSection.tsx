@@ -2,30 +2,36 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Smartphone, Globe, BrainCircuit, Paintbrush, ArrowRight } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  MobileProgramming01Icon,
+  WebDesign02Icon,
+  BrushIcon,
+  AiNetworkIcon,
+} from "@hugeicons/core-free-icons";
 import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import { RISE, STAGGER, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { sections } from "@/data/copy";
 
 const services = [
   {
-    icon: Smartphone,
+    icon: MobileProgramming01Icon,
     title: "Mobile App Development",
     desc: "iOS and Android apps built with Flutter or React Native. One codebase, native performance, and store submission handled for you. Built to scale from first users to first thousand.",
   },
   {
-    icon: Globe,
+    icon: WebDesign02Icon,
     title: "Web App Development",
     desc: "Fast, responsive web platforms and SaaS products. Built on modern stacks, measured on real business outcomes  signups, sales, and retention, not just page views.",
   },
   {
-    icon: BrainCircuit,
+    icon: AiNetworkIcon,
     title: "AI Solutions",
     desc: "Practical AI, not demos. Assistants, automated workflows, document processing, and intelligent features inside your existing product  with human review where it matters.",
   },
   {
-    icon: Paintbrush,
+    icon: BrushIcon,
     title: "UI/UX Design",
     desc: "Interfaces people understand in seconds. Research, wireframes, and polished design systems that make your product feel premium and stay consistent as it grows.",
   },
@@ -92,8 +98,6 @@ type Service = (typeof services)[number];
 
 
 function ServiceCard({ service: s, index }: { service: Service; index: number }) {
-  const Icon: LucideIcon = s.icon;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: RISE.base }}
@@ -104,7 +108,7 @@ function ServiceCard({ service: s, index }: { service: Service; index: number })
     >
       {/* Icon tile  soft cyan square, dark glyph, exactly as in the catalogue cards */}
       <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-signal">
-        <Icon className="h-[22px] w-[22px] text-white" strokeWidth={1.75} />
+        <HugeiconsIcon icon={s.icon} size={22} className="text-white" strokeWidth={1.75} />
       </div>
 
       <h3 className="mt-6 text-[21px] font-bold leading-snug tracking-[-0.02em] text-primary">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { CircleCheckBig } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
-import SectionCtaButton from "@/components/layout/SectionCtaButton";
+import ClosingCta from "@/components/layout/ClosingCta";
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import CountUp from "@/components/motion/CountUp";
 import Reveal from "@/components/motion/Reveal";
@@ -54,7 +54,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Our Mission — light band, image right */}
+
       <section className="py-16 md:py-20">
         <div className="container-px w-full max-w-[1600px] mx-auto">
           <div className="flex flex-col md:flex-row-reverse gap-12 lg:gap-20 items-center">
@@ -69,13 +69,13 @@ export default function AboutPage() {
             </Reveal>
 
             <Reveal delay={STAGGER} className="w-full md:w-7/12 flex flex-col justify-center">
-              <span className="mb-4 text-center font-mono text-[14px] font-medium uppercase tracking-[0.2em] text-signal">
+              <span className="mb-4  font-mono text-[14px] font-medium uppercase tracking-[0.2em] text-signal">
                 {aboutPage.mission.eyebrow}
               </span>
-              <h2 className="text-[40px] md:text-[56px] font-semibold tracking-[-0.04em] mb-6 text-center text-primary">
+              <h2 className="text-[40px] md:text-[56px] font-semibold tracking-[-0.04em] mb-6  text-primary">
                 {aboutPage.mission.title}
               </h2>
-              <p className="text-[16px] md:text-[18px] text-muted leading-relaxed mb-8 text-center">
+              <p className="text-[16px] md:text-[18px] text-muted leading-relaxed mb-8 ">
                 {aboutPage.mission.body}
               </p>
 
@@ -94,16 +94,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* The two feature bands. They alternate side and tone: the first is
-          dark with the image on the left, the second light with it on the
-          right, so the page keeps its rhythm as features are added. */}
+
       {aboutPage.features.map((feature, i) => {
         const dark = i % 2 === 0;
         return (
           <section key={feature.id} className={`py-16 md:py-20 ${dark ? "bg-dark" : ""}`}>
             <div className="container-px w-full max-w-[1600px] mx-auto">
               <div
-                className={`flex flex-col gap-12 lg:gap-20 items-center ${
+                className={`flex flex-col gap-12 lg:gap-20  ${
                   dark ? "md:flex-row" : "md:flex-row-reverse"
                 }`}
               >
@@ -122,18 +120,18 @@ export default function AboutPage() {
                 </Reveal>
 
                 <Reveal delay={STAGGER} className="w-full md:w-7/12 flex flex-col justify-center">
-                  <span className="mb-4 text-center font-mono text-[14px] font-medium uppercase tracking-[0.2em] text-signal">
+                  <span className="mb-4  font-mono text-[14px] font-medium uppercase tracking-[0.2em] text-signal">
                     {feature.eyebrow}
                   </span>
                   <h3
-                    className={`text-[32px] md:text-[44px] font-semibold tracking-[-0.04em] mb-5 text-center ${
+                    className={`text-[32px] md:text-[44px] font-semibold tracking-[-0.04em] mb-5  ${
                       dark ? "text-white" : "text-primary"
                     }`}
                   >
                     {feature.title}
                   </h3>
                   <p
-                    className={`text-[16px] md:text-[18px] leading-relaxed mb-8 mx-auto max-w-xl text-center ${
+                    className={`text-[16px] md:text-[18px] leading-relaxed mb-8 max-w-xl  ${
                       dark ? "text-white/60" : "text-muted"
                     }`}
                   >
@@ -161,25 +159,13 @@ export default function AboutPage() {
         );
       })}
 
-      {/* Vision + closing CTA — same glass card the Services page closes on. */}
-      <section className="py-16 sm:py-24">
-        <div className="container-px mx-auto w-full max-w-[1400px]">
-          <Reveal className="glass flex flex-col items-center gap-4 rounded-3xl p-10 text-center sm:p-16">
-            <h2 className="text-3xl font-semibold tracking-[-0.03em] text-primary sm:text-4xl">
-              {aboutPage.closingCta.title}
-            </h2>
-            <p className="max-w-2xl text-lg text-muted">{aboutPage.closingCta.description}</p>
-            <p className="max-w-2xl text-lg font-medium text-primary">
-              {aboutPage.closingCta.closer}
-            </p>
-            <div className="mt-2">
-              <SectionCtaButton href={aboutPage.closingCta.cta.href}>
-                {aboutPage.closingCta.cta.label}
-              </SectionCtaButton>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      {/* Vision + closing CTA — same card the Services page closes on. */}
+      <ClosingCta
+        title={aboutPage.closingCta.title}
+        description={aboutPage.closingCta.description}
+        closer={aboutPage.closingCta.closer}
+        cta={aboutPage.closingCta.cta}
+      />
     </div>
   );
 }

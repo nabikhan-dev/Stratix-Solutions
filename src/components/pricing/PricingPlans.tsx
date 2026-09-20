@@ -4,11 +4,7 @@ import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import TierCards from "@/components/pricing/TierCards";
 import { sections } from "@/data/copy";
 
-/**
- * The home page's pricing block — the three fixed-price packages on a white
- * band, the same cards /pricing leads with. Replaces the old comparison
- * table + estimator section.
- */
+
 export default function PricingPlans() {
   return (
     <section id="pricing" className="bg-surface py-16 sm:py-20">

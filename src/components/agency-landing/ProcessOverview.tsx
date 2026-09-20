@@ -82,18 +82,17 @@ export default function ProcessOverview() {
                     setActive(i);
                     setHeld(true);
                   }}
-                  className={`relative  bg-white/[0.09]  overflow-hidden rounded-2xl border p-6 transition-all duration-500 
+                  className={`relative bg-white/[0.09] overflow-hidden rounded-2xl border p-6 transition-all duration-500
                     ease-[cubic-bezier(0.33,1,0.68,1)] sm:last:col-span-2 lg:p-7 lg:last:col-span-1 ${
                     on ? "bg-white/[0.09] lg:-translate-y-1.5" : "bg-white/[0.02]"
                   }`}
                   style={{
                     borderColor: on ? tint : "rgba(255,255,255,0.10)",
+    
                     boxShadow: on ? `0 24px 60px -34px ${tint}` : "none",
                   }}
                 >
-                
-                
-=
+        
                   <span
                     aria-hidden="true"
                     className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full blur-2xl transition-opacity duration-700"
@@ -103,18 +102,18 @@ export default function ProcessOverview() {
                     }}
                   />
 
-                  <span className="relative flex items-center gap-2.5">
-               
-                    <span
-                      className="font-mono text-[16px] font-medium tracking-[0.18em] transition-opacity duration-500"
-                      style={{ color: tint, opacity: on ? 1 : 0.6 }}
-                    >
-                      {step.number}
-                    </span>
+                  {/* Oversized step number: a watermark in the top-right corner,
+                      behind the copy. It is absolutely positioned, so it takes no
+                      layout space and the card keeps its original size. */}
+                  <span
+                    className="pointer-events-none absolute -top-3 right-3 z-0 text-[76px] font-bold leading-none tracking-[-0.05em] transition-opacity duration-500 lg:-top-4 lg:right-4 lg:text-[88px]"
+                    style={{ color: tint, opacity: on ? 0.22 : 0.13 }}
+                  >
+                    {step.number}
                   </span>
 
                   <h3
-                    className={`relative mt-5 text-[22px] font-semibold tracking-[-0.03em] transition-colors duration-500 ${
+                    className={`relative text-[22px] font-semibold tracking-[-0.03em] transition-colors duration-500 ${
                       on ? "text-white" : "text-white/70"
                     }`}
                   >
