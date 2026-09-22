@@ -129,9 +129,10 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={htmlFor} className="text-xs text-muted">
-        {label} *
+    <div className="flex flex-col gap-2.5">
+      <label htmlFor={htmlFor} className="text-[13px] font-semibold text-primary">
+        {label} <span className="text-signal" aria-hidden="true">*</span>
+        <span className="sr-only"> (required)</span>
       </label>
       {children}
       {error && (
@@ -144,8 +145,10 @@ function Field({
 }
 
 function inputClass(hasError: boolean) {
-  return `w-full rounded-xl border bg-void px-4 py-4 text-sm text-primary placeholder:text-faint outline-none transition focus:border-signal ${
-    hasError ? "border-amber" : "border-line"
+  return `contact-field min-h-14 w-full rounded-xl border bg-void px-4 py-3.5 text-[15px] text-primary caret-signal placeholder:text-faint transition-[border-color,background-color,box-shadow] duration-200 ${
+    hasError
+      ? "border-amber focus-visible:border-amber focus-visible:shadow-[0_6px_18px_var(--amber-soft)]"
+      : "border-line hover:border-line-strong focus-visible:border-signal focus-visible:bg-surface focus-visible:shadow-[0_6px_18px_var(--signal-soft)]"
   }`;
 }
 

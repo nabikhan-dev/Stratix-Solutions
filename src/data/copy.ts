@@ -24,14 +24,6 @@ export const pageHeroes = {
     description:
       "No “contact us for a quote” games. See real numbers below, or read exactly how we price fixed-scope product builds, app-store launches, and ongoing engineering support.",
   },
-  products: {
-    eyebrow: "Solutions",
-    /** Rendered with `titleAccent` in signal colour on the second half. */
-    title: "Practical services,",
-    titleAccent: "built around your business.",
-    description:
-      "Stratix Solutions focuses on service delivery: AI systems, UI/UX design, mobile apps, and responsive web platforms designed for your workflow, customers, and launch goals.",
-  },
   blog: {
     eyebrow: "Blog",
     title: "Stratix Solutions",
@@ -126,19 +118,13 @@ export const sections = {
       "Most products need more than one. Tell us what you’re building on a free call and we’ll map the shortest path to launch  with a fixed price attached.",
     cta: { label: "Book a Free Call", href: "/contact" },
   },
-  productsGrid: {
-    eyebrow: "Our products",
-    title: "Choose the build your team needs",
-    description:
-      "Each engagement starts with clear scope, practical milestones, and a delivery path that fits the product.",
-  },
   pricingTiers: {
     eyebrow: "PRICING",
-    title: "Fixed price for scoped builds. Hourly for ongoing support.",
+    title: "Fixed-price MVPs, scoped before we start.",
     description:
-      "We price product work around clear scope. For fixed-price builds, we define the feature list together on a free call, lock the price, and split it into milestones. If the build takes longer than estimated, that’s our problem, not your invoice. Most MVPs land between $5,000 and $12,000 and ship in 2–8 weeks.",
+      "Choose the plan closest to your product. On a free scoping call, we confirm the features, timeline, and final price before work begins. Payments are split across milestones, and scope changes are agreed before they affect the cost.",
     rationale:
-      "Why are we priced below US or EU firms quoting $50k+ for the same product? Efficient cross-platform stacks, a lean senior team, and ruthless scoping before we quote. Same quality. Less overhead.",
+      "A lean senior team and cross-platform technology keep delivery efficient, so more of your budget goes into the product—not layers of agency overhead.",
   },
   /** The money questions, below the plans on /pricing. */
   pricingFaq: {

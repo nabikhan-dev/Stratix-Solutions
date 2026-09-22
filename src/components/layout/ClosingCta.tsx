@@ -18,7 +18,7 @@ export default function ClosingCta({
 }) {
   return (
     <section className={`py-16 sm:py-24 ${className}`}>
-      <div className="container-px mx-auto w-full max-w-[1400px]">
+      <div className="container-px mx-auto w-full max-w-[1440px]">
         <div className="flex flex-col items-center gap-4 rounded-3xl bg-signal p-10 text-center sm:p-16">
           <Reveal>
             <h2 className="text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">

@@ -6,11 +6,7 @@ import { weekByWeek } from "@/data/content";
 import { RISE, STAGGER, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { sections } from "@/data/copy";
 
-/**
- * The build calendar as a numbered rail on a white band: a hairline spine
- * with a numbered node per stage, each stage's copy in its own card beside
- * it. Replaces the old dark two-column rows.
- */
+
 export default function WeekByWeek() {
   return (
     <section className="bg-surface py-14 sm:py-16">
@@ -53,7 +49,7 @@ export default function WeekByWeek() {
         </div>
 
         <div className="relative mt-10">
-          {/* Spine the nodes sit on */}
+
           <div className="absolute bottom-6 left-4 top-6 w-px bg-line sm:left-5" aria-hidden="true" />
 
           <div className="flex flex-col gap-6">
@@ -70,14 +66,14 @@ export default function WeekByWeek() {
                   {i + 1}
                 </span>
 
-                <div className="flex-1 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-500 hover:border-line-strong hover:shadow-[0_18px_40px_-18px_rgba(15,23,42,0.18)]">
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-signal">
+                <div className="relative flex-1 overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow,background-color] duration-500 before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-20 before:bg-linear-to-r before:from-signal/[0.08] before:to-transparent before:opacity-0 before:transition-opacity before:duration-500 group-hover:border-signal/30 group-hover:bg-signal/[0.02] group-hover:shadow-[0_18px_40px_-18px_var(--signal-soft)] group-hover:before:opacity-100">
+                  <span className="relative font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-signal">
                     {w.week}
                   </span>
-                  <h3 className="mt-2 font-display text-lg font-semibold tracking-[-0.03em] text-primary">
+                  <h3 className="relative mt-2 font-display text-lg font-semibold tracking-[-0.03em] text-primary">
                     {w.title}
                   </h3>
-                  <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-muted">
+                  <p className="relative mt-2 max-w-2xl text-[14px] leading-relaxed text-muted">
                     {w.description}
                   </p>
                 </div>

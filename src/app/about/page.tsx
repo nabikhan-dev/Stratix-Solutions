@@ -55,7 +55,7 @@ export default function AboutPage() {
       </section>
 
 
-      <section className="py-16 md:py-20">
+      <section className="pb-16 md:pb-20">
         <div className="container-px w-full max-w-[1600px] mx-auto">
           <div className="flex flex-col md:flex-row-reverse gap-12 lg:gap-20 items-center">
             <Reveal className="w-full md:w-5/12 aspect-[4/3] relative rounded-2xl overflow-hidden border border-line">

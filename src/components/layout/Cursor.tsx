@@ -8,14 +8,9 @@ const IDLE_SIZE = 22;
 const FRAME_PAD = 14;
 /** Lerp factor for the follow/expand animation. */
 const EASE = 0.2;
-/**
- * What the brackets latch onto: every enabled button, every real link, plus
- * anything opting in with `data-cursor-frame`. Links get the same frame as
- * buttons; the tag falls back to the element name, so a plain link reads `<a>`
- * while the link-based buttons (SectionCtaButton, SecondaryCta)
- * override it to `<button>` — which is what they read as.
- */
+
 const FRAME_SELECTOR = "button:not([disabled]), a[href], [data-cursor-frame]";
+const NATIVE_CURSOR_SELECTOR = "input, textarea, select, [contenteditable='true']";
 
 export default function Cursor() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -64,9 +59,16 @@ export default function Cursor() {
         moved = true;
         x = pointerX;
         y = pointerY;
-        rootRef.current?.setAttribute("data-visible", "true");
       }
       const target = e.target as HTMLElement | null;
+
+      if (target?.closest?.(NATIVE_CURSOR_SELECTOR)) {
+        rootRef.current?.removeAttribute("data-visible");
+        lockTo(null);
+        return;
+      }
+
+      rootRef.current?.setAttribute("data-visible", "true");
       lockTo(target?.closest?.<HTMLElement>(FRAME_SELECTOR) ?? null);
     }
 
@@ -118,7 +120,7 @@ export default function Cursor() {
       <span className="cursor-point__corner cursor-point__corner--tr" />
       <span className="cursor-point__corner cursor-point__corner--bl" />
       <span className="cursor-point__corner cursor-point__corner--br" />
-      <span ref={tagRef} className="cursor-point__tag" />
+
     </div>
   );
 }

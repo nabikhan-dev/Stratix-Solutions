@@ -42,7 +42,7 @@ export default function PricingPage() {
 
       <section className="container-px bg-surface py-16 sm:py-20">
         <div className="mx-auto max-w-[1400px]">
-          <div className="mx-auto max-w-2xl text-center">
+          <div className="mx-auto w-full max-w-3xl text-center">
             <SectionHeading
               align="center"
               eyebrow={sections.pricingTiers.eyebrow}
@@ -51,9 +51,11 @@ export default function PricingPage() {
             />
 
             <Reveal delay={0.1}>
-              <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-muted">
-                {sections.pricingTiers.rationale}
-              </p>
+              <div className="mx-auto mt-7 max-w-2xl rounded-2xl border border-signal/15 bg-signal/[0.04] px-5 py-4 sm:px-6">
+                <p className="text-sm leading-6 text-muted sm:text-[15px]">
+                  {sections.pricingTiers.rationale}
+                </p>
+              </div>
             </Reveal>
           </div>
 

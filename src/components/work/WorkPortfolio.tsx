@@ -109,8 +109,8 @@ export default function WorkPortfolio() {
                     </div>
 
                     {project.metric && (
-                      <div className="flex flex-col items-center justify-center py-4 px-5 rounded-2xl bg-dark border border-line min-w-[130px] shrink-0">
-                        <span className="text-[26px] font-bold text-signal mb-1">
+                      <div className="flex flex-col items-center justify-center py-4 px-5 rounded-2xl bg-signal border border-line min-w-[130px] shrink-0">
+                        <span className="text-[26px] font-bold text-white mb-1">
                           {project.metric.value}
                         </span>
                         <span className="text-[9px] font-bold tracking-widest uppercase text-white/50 text-center leading-snug">

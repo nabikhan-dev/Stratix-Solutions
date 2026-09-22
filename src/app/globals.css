@@ -277,6 +277,13 @@ select:focus-visible,
   border-radius: 4px;
 }
 
+/* Form controls use their own single-border focus treatment. */
+.contact-field:focus-visible {
+  outline: none;
+  outline-offset: 0;
+  border-radius: 0.75rem;
+}
+
 /* ----------------------------------------------------------------------
    Text roll — see TextRoll.tsx. The label sits in a mask exactly one line
    tall and hover slides it up a whole box, the incoming copy following it
@@ -327,4 +334,3 @@ select:focus-visible,
     transform: translateY(0);
   }
 }
-

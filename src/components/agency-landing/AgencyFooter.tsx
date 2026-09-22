@@ -6,14 +6,12 @@ export default function AgencyFooter() {
   const links = {
     Company: [
       { label: "About Us", href: "/about" },
-      { label: "How We Work", href: "/how-we-work" },
       { label: "Our Work", href: "/work" },
       { label: "Blog", href: "/blog" },
       { label: "Contact", href: "/contact" },
     ],
     Services: [
       { label: "Services", href: "/services" },
-      { label: "Products", href: "/products" },
       { label: "Pricing", href: "/pricing" },
       { label: "FAQ", href: "/faq" },
     ],
@@ -25,9 +23,6 @@ export default function AgencyFooter() {
     <footer className="bg-dark text-white pt-28 pb-10 overflow-hidden border-t rounded-2xl border-white/10">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-8">
 
-        {/* Top section: brand blurb + links, asymmetric split instead of a stacked block.
-            `data-reveal` rather than a motion component so the footer stays a
-            server component — RevealScroll picks it up from the root layout. */}
         <div
           data-reveal
           data-reveal-duration="1000"
@@ -52,7 +47,7 @@ export default function AgencyFooter() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-7">
             {Object.entries(links).map(([category, items]) => (
               <div key={category} data-reveal-stagger-child className="flex flex-col gap-5">
-                <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/40">
+                <h3 className="font-mono text-[18px] font-medium uppercase tracking-[0.12em] text-white/80">
                   {category}
                 </h3>
                 <ul className="flex flex-col gap-3.5">

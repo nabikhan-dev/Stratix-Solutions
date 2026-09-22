@@ -65,21 +65,6 @@ export const primaryServices: PrimaryService[] = [
   },
 ];
 
-export const products = [
-  {
-    id: "ai-solutions",
-    name: "AI Solutions",
-    tagline: "Practical AI tools designed around how your business actually works.",
-    world: "intelligence",
-  },
-  {
-    id: "digital-products",
-    name: "Digital Product Development",
-    tagline: "Digital products planned, designed, built, and launched by one team.",
-    world: "product",
-  },
-];
-
 export const processSteps = [
   {
     id: "scope",

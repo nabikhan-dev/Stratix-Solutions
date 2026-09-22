@@ -104,7 +104,7 @@ function ServiceCard({ service: s, index }: { service: Service; index: number })
       whileInView={{ opacity: 1, y: 0 }}
       viewport={VIEWPORT}
       transition={enterAt(index)}
-      className="group relative flex h-full flex-col rounded-2xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-500 hover:border-line-strong hover:shadow-[0_18px_40px_-18px_rgba(15,23,42,0.22)] sm:p-8"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow,background-color] duration-500 before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-20 before:bg-linear-to-r before:from-signal/[0.08] before:to-transparent before:opacity-0 before:transition-opacity before:duration-500 hover:border-signal/30 hover:bg-signal/[0.02] hover:shadow-[0_18px_40px_-18px_var(--signal-soft)] hover:before:opacity-100 sm:p-8"
     >
       {/* Icon tile  soft cyan square, dark glyph, exactly as in the catalogue cards */}
       <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-signal">

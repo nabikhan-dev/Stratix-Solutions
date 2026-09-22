@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
+import {
+  BLOG_VIEW_COUNTING_DISABLED,
+  BLOG_VIEW_COUNTING_PREFERENCE_KEY,
+} from "@/lib/privacy-preferences";
 
 /**
  * Live view count for a blog post. GET-only when just displaying a count
@@ -27,8 +31,10 @@ export default function ViewBadge({
   useEffect(() => {
     let cancelled = false;
     const sessionKey = `viewed:${slug}`;
-    const alreadyRecorded = record && sessionStorage.getItem(sessionKey);
-    const method = record && !alreadyRecorded ? "POST" : "GET";
+    const countingDisabled =
+      localStorage.getItem(BLOG_VIEW_COUNTING_PREFERENCE_KEY) === BLOG_VIEW_COUNTING_DISABLED;
+    const alreadyRecorded = record && !countingDisabled && sessionStorage.getItem(sessionKey);
+    const method = record && !countingDisabled && !alreadyRecorded ? "POST" : "GET";
 
     fetch(`/api/views/${slug}`, { method })
       .then((res) => res.json())
