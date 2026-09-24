@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/dashboard/session";
+import { getAdminStorage } from "@/lib/firebase-admin";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -13,7 +13,7 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
-  // Auth-gated — this writes to Vercel Blob, so it must not be a public endpoint.
+  // Auth-gated
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
@@ -39,17 +39,29 @@ export async function POST(req: Request) {
   }
 
   const filename = `${randomUUID()}.${extension}`;
+  const bucket = getAdminStorage();
 
   try {
-    const blob = await put(filename, file, {
-      access: 'public',
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const fileObj = bucket.file(`uploads/${filename}`);
+
+    await fileObj.save(fileBuffer, {
+      metadata: {
+        contentType: file.type,
+      },
     });
 
-    return NextResponse.json({ url: blob.url });
+    // Make the file publicly accessible
+    await fileObj.makePublic();
+
+    // Get the public URL
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/uploads/${filename}`;
+
+    return NextResponse.json({ url: publicUrl });
   } catch (error) {
-    console.error("Vercel Blob Upload Error:", error);
+    console.error("Firebase Storage Upload Error:", error);
     return NextResponse.json(
-      { error: "Failed to upload. Ensure Vercel Blob is configured in your project." },
+      { error: "Failed to upload to Firebase Storage." },
       { status: 500 }
     );
   }

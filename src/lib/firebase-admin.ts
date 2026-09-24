@@ -1,6 +1,7 @@
 import "server-only";
 import { initializeApp, getApps, cert, App } from "firebase-admin/app";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 
 let adminApp: App;
 
@@ -40,4 +41,8 @@ export function getAdminDb(): Firestore {
     _db.settings({ ignoreUndefinedProperties: true });
   }
   return _db;
+}
+
+export function getAdminStorage() {
+  return getStorage(getAdminApp()).bucket("stratix-solutions.firebasestorage.app");
 }
