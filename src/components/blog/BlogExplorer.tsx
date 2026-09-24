@@ -86,7 +86,7 @@ export default function BlogExplorer({ blogPosts }: { blogPosts: BlogPost[] }) {
               <img
                 src={featured.image}
                 alt={featured.title}
-                className="block w-full h-auto rounded-[32px] lg:rounded-l-[32px] lg:rounded-r-none transition-transform duration-700 ease-out group-hover:scale-105"
+                className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
               />
             </div>
 
