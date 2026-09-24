@@ -1,19 +1,7 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/dashboard/session";
-
-// Lets the dashboard upload an image file from disk instead of only
-// pasting a URL. Writes straight to /public/uploads and hands back the
-// resulting path — no object-storage service wired up.
-//
-// Same caveat as the rest of the dashboard's data layer: this needs a
-// writable filesystem that persists between requests. Works fine for local
-// dev and a traditional Node/Docker server; it will NOT work on serverless
-// hosts (Vercel, etc.) where the filesystem is read-only/ephemeral at
-// runtime — swap this for real object storage (S3, Vercel Blob, Supabase
-// Storage, ...) before deploying there.
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -25,10 +13,7 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
-  // Auth-gated — this writes to disk, so it must not be a public endpoint.
-  // A plain 401 here (not requireSession()'s redirect) because this is hit
-  // via fetch() from the dashboard UI, not rendered as a page — a redirect
-  // response would just fail to parse as the JSON the client expects.
+  // Auth-gated — this writes to Vercel Blob, so it must not be a public endpoint.
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
@@ -53,12 +38,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "File is larger than 5MB." }, { status: 400 });
   }
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadsDir, { recursive: true });
-
   const filename = `${randomUUID()}.${extension}`;
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadsDir, filename), bytes);
 
-  return NextResponse.json({ url: `/uploads/${filename}` });
+  try {
+    const blob = await put(filename, file, {
+      access: 'public',
+    });
+
+    return NextResponse.json({ url: blob.url });
+  } catch (error) {
+    console.error("Vercel Blob Upload Error:", error);
+    return NextResponse.json(
+      { error: "Failed to upload. Ensure Vercel Blob is configured in your project." },
+      { status: 500 }
+    );
+  }
 }
