@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, inputClass, Card, FormError } from "@/components/dashboard/ui";
+import { Field, inputClass, scrollableInputClass, Card, FormError, textareaClass} from "@/components/dashboard/ui";
 import SubmitButton from "@/components/dashboard/SubmitButton";
 import { updateServiceAction, type ServiceFormState } from "./actions";
 import type { PrimaryService } from "@/data/content";
@@ -24,7 +24,7 @@ export default function ServiceEditCard({ service }: { service: PrimaryService }
         </Field>
 
         <Field label="Short description" htmlFor={`short-${service.id}`}>
-          <input id={`short-${service.id}`} name="short" required defaultValue={service.short} className={inputClass} />
+          <textarea id={`short-${service.id}`} name="short" required defaultValue={service.short} className={scrollableInputClass} data-lenis-prevent="true" />
         </Field>
 
         <Field label="Full description" htmlFor={`description-${service.id}`}>
@@ -34,7 +34,8 @@ export default function ServiceEditCard({ service }: { service: PrimaryService }
             required
             rows={4}
             defaultValue={service.description}
-            className={inputClass}
+            className={textareaClass}
+            data-lenis-prevent="true"
           />
         </Field>
 
@@ -45,6 +46,20 @@ export default function ServiceEditCard({ service }: { service: PrimaryService }
             defaultValue={service.motifWords.join(", ")}
             className={inputClass}
           />
+        </Field>
+
+        <Field label="Visibility" htmlFor={`isActive-${service.id}`}>
+          <label className="flex items-center gap-2 text-[14px] text-primary">
+            <input
+              type="checkbox"
+              id={`isActive-${service.id}`}
+              name="isActive"
+              value="true"
+              defaultChecked={service.isActive !== false}
+              className="h-4 w-4 rounded border-line text-signal focus:ring-signal"
+            />
+            Show this service on the public site
+          </label>
         </Field>
 
         <FormError message={state?.error} />

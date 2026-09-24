@@ -9,12 +9,14 @@ import {
   Sparkles,
   CircleDollarSign,
   Settings as SettingsIcon,
+  MessageSquare,
 } from "lucide-react";
 
 const items = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/blog", label: "Blog", icon: Newspaper, exact: false },
   { href: "/dashboard/projects", label: "Projects", icon: Briefcase, exact: false },
+  { href: "/dashboard/testimonials", label: "Testimonials", icon: MessageSquare, exact: false },
   { href: "/dashboard/services", label: "Services", icon: Sparkles, exact: false },
   { href: "/dashboard/pricing", label: "Pricing", icon: CircleDollarSign, exact: false },
   { href: "/dashboard/settings", label: "Settings", icon: SettingsIcon, exact: false },

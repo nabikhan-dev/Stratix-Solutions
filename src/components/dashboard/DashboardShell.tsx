@@ -10,7 +10,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-void">
       <div className="flex min-h-screen">
-        <aside className="sticky top-0 hidden h-screen w-64 flex-col overflow-hidden bg-dark px-4 py-6 lg:flex">
+        <aside className="sticky top-0 hidden h-screen w-64 flex-col overflow-hidden bg-dark px-4 py-6 lg:flex shrink-0">
           <div
             className="pointer-events-none absolute inset-0 opacity-60"
             style={{

@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 import ViewBadge from "@/components/blog/ViewBadge";
-import { blogPosts } from "@/data/blog";
+import { listBlogPosts, getBlogPost } from "@/lib/dashboard/store";
 import Reveal from "@/components/motion/Reveal";
+import { STAGGER } from "@/lib/motion";
 import ClosingCta from "@/components/layout/ClosingCta";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const blogPosts = await listBlogPosts();
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
@@ -18,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogPost(slug);
 
   if (!post) return {};
 
@@ -45,12 +47,13 @@ function initials(name: string) {
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogPost(slug);
 
   if (!post) {
     notFound();
   }
 
+  const blogPosts = await listBlogPosts();
   const related = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
 
   return (
@@ -106,11 +109,31 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <Reveal delay={0.25}>
         <div className="container-px mx-auto mt-12 w-full max-w-[1440px]">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-[32px] border border-line shadow-xl">
-            <Image src={post.image} alt={post.title} fill sizes="(min-width: 1440px) 1248px, 90vw" priority className="object-cover" />
+          <div className="relative overflow-hidden rounded-[32px] border border-line shadow-xl">
+            <img src={post.image} alt={post.title} className="block w-full h-auto" />
           </div>
         </div>
       </Reveal>
+
+      {post.gallery && post.gallery.length > 0 && (
+        <div className="container-px relative z-10 mx-auto mt-16 w-full max-w-[1440px]">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {post.gallery.map((img, idx) => (
+              <Reveal
+                key={idx}
+                delay={idx * STAGGER}
+                className="group relative overflow-hidden rounded-[20px] border border-line"
+              >
+                <img
+                  src={img}
+                  alt={`${post.title} gallery image ${idx + 1}`}
+                  className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="container-px relative z-10 mx-auto mt-16 w-full max-w-[1440px]">
         <div className="mx-auto flex max-w-4xl flex-col gap-10">
@@ -118,11 +141,28 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <Reveal key={i} delay={Math.min(i * 0.05, 0.3)}>
               <div>
                 {section.heading && (
-                  <h2 className="mb-3 text-2xl font-semibold tracking-[-0.03em] text-primary">
+                  <h2 className="mb-6 text-2xl font-semibold tracking-[-0.03em] text-primary">
                     {section.heading}
                   </h2>
                 )}
-                <p className="text-[17px] leading-8 text-muted">{section.body}</p>
+                {section.images && section.images.length > 0 && (
+                  <div className={`mb-8 grid gap-6 ${section.images.length > 1 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
+                    {section.images.map((img, imgIdx) => (
+                      <Reveal
+                        key={imgIdx}
+                        delay={imgIdx * STAGGER}
+                        className="group relative overflow-hidden rounded-[20px] border border-line"
+                      >
+                        <img
+                          src={img}
+                          alt={`${section.heading || post.title} image ${imgIdx + 1}`}
+                          className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                      </Reveal>
+                    ))}
+                  </div>
+                )}
+                <p className="text-[17px] leading-8 text-muted whitespace-pre-wrap">{section.body}</p>
               </div>
             </Reveal>
           ))}
@@ -145,13 +185,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {related.map((p, i) => (
               <Reveal key={p.slug} delay={i * 0.05}>
                 <Link href={`/blog/${p.slug}`} className="group flex flex-col">
-                  <div className="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-[20px] border border-line">
-                    <Image
+                  <div className="relative mb-4 w-full overflow-hidden rounded-[20px] border border-line">
+                    <img
                       src={p.image}
                       alt={p.title}
-                      fill
-                      sizes="(min-width: 1440px) 400px, (min-width: 640px) 30vw, 100vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                     />
                   </div>
                   <span className="mb-2 text-[11px] font-bold uppercase tracking-widest text-signal">

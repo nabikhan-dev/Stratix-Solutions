@@ -5,36 +5,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { projects } from "@/data/projects";
+import { type Project } from "@/data/projects";
 import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import { RISE, STAGGER, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { sections } from "@/data/copy";
 
-type Category = "All" | "Websites" | "Mobile Apps";
-
-export default function ProjectsPortfolio() {
-  const [activeCategory, setActiveCategory] = useState<Category>("All");
-
-  // Determine category based on tags (since they aren't explicitly categorized in the data)
-  const getCategory = (tags: string[]): "Websites" | "Mobile Apps" => {
-    const mobileKeywords = [
-      "react native",
-      "swift",
-      "flutter",
-      "ios",
-      "android",
-      "healthkit",
-    ];
-    const isMobile = tags.some((tag) =>
-      mobileKeywords.some((keyword) => tag.toLowerCase().includes(keyword)),
-    );
-    return isMobile ? "Mobile Apps" : "Websites";
-  };
+export default function ProjectsPortfolio({ projects }: { projects: Project[] }) {
+  const [activeCategory, setActiveCategory] = useState<string>("All");
 
   const filteredProjects = projects.filter((project) => {
     if (activeCategory === "All") return true;
-    return getCategory(project.tags) === activeCategory;
+    return (project.category ?? "Uncategorized") === activeCategory;
   });
+
+  const usedCategories = Array.from(new Set(projects.map(p => p.category ?? "Uncategorized"))).sort();
+  const dynamicCategories = ["All", ...usedCategories];
 
   return (
     <section id="projects" className="py-20 bg-void relative overflow-hidden">
@@ -73,27 +58,29 @@ export default function ProjectsPortfolio() {
           </div>
 
           {/* Filters */}
-          <motion.div
-            initial={{ opacity: 0, y: RISE.sm }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={VIEWPORT}
-            transition={enter(STAGGER * 3)}
-            className="flex items-center gap-1 p-1.5 rounded-full bg-deep border border-line shrink-0 overflow-x-auto no-scrollbar"
-          >
-            {(["All", "Websites", "Mobile Apps"] as Category[]).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2.5 rounded-full text-[14px] font-semibold transition-all whitespace-nowrap ${
-                  activeCategory === cat
-                    ? "bg-[var(--signal)] text-white shadow-lg shadow-[var(--signal-soft)]"
-                    : "text-muted hover:text-primary hover:bg-deep"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </motion.div>
+          {projects.length > 0 && dynamicCategories.length > 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: RISE.sm }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              transition={enter(STAGGER * 3)}
+              className="flex items-center gap-1 p-1.5 rounded-full bg-deep border border-line shrink-0 overflow-x-auto no-scrollbar"
+            >
+              {dynamicCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-6 py-2.5 rounded-full text-[14px] font-semibold transition-all whitespace-nowrap ${
+                    activeCategory === cat
+                      ? "bg-[var(--signal)] text-white shadow-lg shadow-[var(--signal-soft)]"
+                      : "text-muted hover:text-primary hover:bg-deep"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </motion.div>
+          )}
         </div>
 
         {/* Grid */}
@@ -103,9 +90,6 @@ export default function ProjectsPortfolio() {
         >
           <AnimatePresence mode="popLayout">
             {filteredProjects.slice(0, 4).map((project, i) => {
-              const categoryName = getCategory(project.tags);
-              const isWebsite = categoryName === "Websites";
-
               return (
                 <motion.div
                   layout
@@ -119,15 +103,13 @@ export default function ProjectsPortfolio() {
                 >
                   {/* Image Container (The Interactive Area) */}
                   <div
-                    className={`relative w-full aspect-[4/3] rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}
+                    className={`relative w-full rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}
                   >
                     {/* The Image (Hides on Hover) */}
-                    <Image
+                    <img
                       src={project.image}
                       alt={project.title}
-                      fill
-                      sizes="(min-width: 768px) 50vw, 100vw"
-                      className="object-cover transition-all duration-500 ease-out group-hover:scale-110 group-hover:opacity-100"
+                      className="block w-full h-auto transition-all duration-500 ease-out group-hover:scale-110 group-hover:opacity-100"
                     />
 
                     {/* Hover Detail Overlay (Shows on Hover) */}
@@ -161,7 +143,7 @@ export default function ProjectsPortfolio() {
 
                   <div className="flex flex-col px-2">
                     <p className="text-[11px] font-medium tracking-[0.15em] uppercase text-muted mb-2">
-                      {isWebsite ? "Website" : "Mobile App"}
+                      {project.category ?? ""}
                     </p>
                     <h3 className="text-2xl font-semibold text-primary tracking-[-0.03em]">
                       {project.title}

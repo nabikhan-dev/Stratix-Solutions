@@ -7,6 +7,7 @@ import ClosingCta from "@/components/layout/ClosingCta";
 
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pageHeroes, sections } from "@/data/copy";
+import { listServices } from "@/lib/dashboard/store";
 
 export const metadata: Metadata = {
   title: "Services | AI, App, Web & UI/UX  Stratix Solution",
@@ -21,7 +22,9 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = (await listServices()).filter(s => s.isActive !== false);
+
   return (
     <div className="min-h-screen">
       <PageHero
@@ -40,7 +43,7 @@ export default function ServicesPage() {
             description={sections.servicesDisciplines.description}
           />
           <div className="mt-12">
-            <ServiceSwitcher />
+            <ServiceSwitcher services={services} />
           </div>
         </div>
       </section>

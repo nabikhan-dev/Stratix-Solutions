@@ -4,62 +4,54 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { projects } from "@/data/projects";
+import { type Project } from "@/data/projects";
 import { RISE, VIEWPORT, enterAt } from "@/lib/motion";
 
-type Category = "All Projects" | "Websites" | "Mobile Apps" | "Digital Strategy";
-
-export default function WorkPortfolio() {
-  const [activeCategory, setActiveCategory] = useState<Category>("All Projects");
-
-  const getCategory = (tags: string[]): "Websites" | "Mobile Apps" | "Digital Strategy" => {
-    const mobileKeywords = ["react native", "swift", "flutter", "ios", "android", "healthkit"];
-    const isMobile = tags.some((tag) =>
-      mobileKeywords.some((keyword) => tag.toLowerCase().includes(keyword))
-    );
-    return isMobile ? "Mobile Apps" : "Websites";
-  };
+export default function WorkPortfolio({ projects }: { projects: Project[] }) {
+  const [activeCategory, setActiveCategory] = useState<string>("All Projects");
 
   const filteredProjects = projects.filter((project) => {
     if (activeCategory === "All Projects") return true;
-    return getCategory(project.tags) === activeCategory;
+    return (project.category ?? "Uncategorized") === activeCategory;
   });
+
+  const usedCategories = Array.from(new Set(projects.map(p => p.category ?? "Uncategorized"))).sort();
+  const dynamicCategories = ["All Projects", ...usedCategories];
 
   return (
     <section className="relative overflow-hidden bg-surface pt-16 pb-20">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 relative z-10">
 
         {/* Filters */}
-        <div className="flex justify-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: RISE.base }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={VIEWPORT}
-            className="flex items-center gap-1 p-1.5 rounded-full bg-deep border border-line shrink-0 overflow-x-auto no-scrollbar max-w-full"
-          >
-            {(["All Projects", "Websites", "Mobile Apps", "Digital Strategy"] as Category[]).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2.5 rounded-full text-[14px] font-semibold transition-all whitespace-nowrap ${
-                  activeCategory === cat
-                    ? "bg-signal text-white shadow-lg shadow-signal-soft"
-                    : "text-muted hover:bg-surface hover:text-primary"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </motion.div>
-        </div>
+        {projects.length > 0 && dynamicCategories.length > 1 && (
+          <div className="flex justify-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: RISE.base }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              className="flex items-center gap-1 p-1.5 rounded-full bg-deep border border-line shrink-0 overflow-x-auto no-scrollbar max-w-full"
+            >
+              {dynamicCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-6 py-2.5 rounded-full text-[14px] font-semibold transition-all whitespace-nowrap ${
+                    activeCategory === cat
+                      ? "bg-signal text-white shadow-lg shadow-signal-soft"
+                      : "text-muted hover:bg-surface hover:text-primary"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </motion.div>
+          </div>
+        )}
 
         {/* Grid */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16">
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, i) => {
-              const categoryName = getCategory(project.tags);
-              const isWebsite = categoryName === "Websites";
-
               return (
                 <motion.div
                   layout
@@ -72,19 +64,19 @@ export default function WorkPortfolio() {
                   className="group flex flex-col cursor-pointer"
                 >
                   {/* Image Container */}
-                  <div className={`relative w-full aspect-[4/3] rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}>
-                    <div className="absolute top-6 left-6 z-10">
-                      <span className="px-4 py-1.5 rounded-full bg-signal text-white text-[10px] font-bold uppercase tracking-widest shadow-md">
-                        {isWebsite ? "Website" : "Mobile App"}
-                      </span>
-                    </div>
+                  <div className={`relative w-full rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}>
+                    {project.category && (
+                      <div className="absolute top-6 left-6 z-10">
+                        <span className="px-4 py-1.5 rounded-full bg-signal text-white text-[10px] font-bold uppercase tracking-widest shadow-md">
+                          {project.category}
+                        </span>
+                      </div>
+                    )}
 
-                    <Image
+                    <img
                       src={project.image}
                       alt={project.title}
-                      fill
-                      sizes="(min-width: 768px) 50vw, 100vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                      className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />
                     <div className="absolute inset-0 bg-dark/0 transition-colors duration-500 group-hover:bg-dark/10" />
 

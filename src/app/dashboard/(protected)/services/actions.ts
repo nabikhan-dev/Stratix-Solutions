@@ -17,21 +17,19 @@ export async function updateServiceAction(_prevState: ServiceFormState, formData
     .split(",")
     .map((w) => w.trim())
     .filter(Boolean);
+  const isActive = formData.get("isActive") === "true";
 
   if (!title) return { error: "Title is required." };
   if (!short) return { error: "Short description is required." };
   if (!description) return { error: "Description is required." };
 
   try {
-    updateService(id, { title, short, description, motifWords });
+    await updateService(id, { title, short, description, motifWords, isActive });
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't save this service." };
   }
 
-  // Note: only revalidates the dashboard's own view. The public /services
-  // page still imports primaryServices directly from src/data/content.ts,
-  // so this edit won't appear there yet — see the note on the overview
-  // page about wiring a real data layer.
-  revalidatePath("/dashboard/services");
+  // Revalidate entire site so public pages reflect the dashboard edits immediately.
+  revalidatePath("/", "layout");
   return { savedAt: Date.now() };
 }

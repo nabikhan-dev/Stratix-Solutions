@@ -29,8 +29,9 @@ function readProjectFormData(formData: FormData) {
     title,
     description,
     tags,
+    category: String(formData.get("category") ?? "").trim() || undefined,
     image: String(formData.get("image") ?? "").trim(),
-    gallery: linesToList(formData.get("gallery")),
+    gallery: formData.getAll("gallery").map(String).map((u) => u.trim()).filter(Boolean),
     results: linesToList(formData.get("results")),
     metric: {
       value: String(formData.get("metricValue") ?? "").trim(),
@@ -39,6 +40,7 @@ function readProjectFormData(formData: FormData) {
     bg: String(formData.get("bg") ?? "").trim() || "bg-white",
     span: String(formData.get("span") ?? "").trim() || "lg:col-span-6",
     light: formData.get("light") === "on",
+    url: String(formData.get("url") ?? "").trim(),
   };
 }
 
@@ -47,7 +49,7 @@ export async function createProjectAction(_prevState: ProjectFormState, formData
 
   let id: number;
   try {
-    const project = createProject(readProjectFormData(formData));
+    const project = await createProject(readProjectFormData(formData));
     id = project.id;
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't create the project." };
@@ -55,6 +57,7 @@ export async function createProjectAction(_prevState: ProjectFormState, formData
 
   revalidatePath("/dashboard/projects");
   revalidatePath("/dashboard");
+  revalidatePath("/", "layout");
   redirect(`/dashboard/projects/${id}`);
 }
 
@@ -63,7 +66,7 @@ export async function updateProjectAction(_prevState: ProjectFormState, formData
 
   const id = Number(formData.get("id"));
   try {
-    updateProject(id, readProjectFormData(formData));
+    await updateProject(id, readProjectFormData(formData));
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't save the project." };
   }
@@ -71,14 +74,16 @@ export async function updateProjectAction(_prevState: ProjectFormState, formData
   revalidatePath("/dashboard/projects");
   revalidatePath(`/dashboard/projects/${id}`);
   revalidatePath("/dashboard");
+  revalidatePath("/", "layout");
   return { error: undefined };
 }
 
 export async function deleteProjectAction(formData: FormData) {
   await requireSession();
   const id = Number(formData.get("id"));
-  deleteProject(id);
+  await deleteProject(id);
   revalidatePath("/dashboard/projects");
   revalidatePath("/dashboard");
+  revalidatePath("/", "layout");
   redirect("/dashboard/projects");
 }

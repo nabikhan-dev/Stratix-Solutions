@@ -3,9 +3,11 @@ import SectionHeading from "@/components/layout/SectionHeading";
 import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import TierCards from "@/components/pricing/TierCards";
 import { sections } from "@/data/copy";
+import { listPricingTiers } from "@/lib/dashboard/store";
 
+export default async function PricingPlans() {
+  const tiers = await listPricingTiers();
 
-export default function PricingPlans() {
   return (
     <section id="pricing" className="bg-surface py-16 sm:py-20">
       <div className="container-px mx-auto max-w-[1400px]">
@@ -17,7 +19,7 @@ export default function PricingPlans() {
         />
 
         <div className="mt-10">
-          <TierCards />
+          <TierCards tiers={tiers} />
         </div>
 
         <Reveal delay={0.1} className="mt-10 flex justify-center">

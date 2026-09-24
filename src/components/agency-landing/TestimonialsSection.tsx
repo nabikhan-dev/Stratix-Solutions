@@ -4,48 +4,10 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { RISE, STAGGER, VIEWPORT, enter } from "@/lib/motion";
 import { sections } from "@/data/copy";
+import { testimonials } from "@/data/testimonials";
 
 /** `dark` swaps the section onto `--bg-dark` — used wherever a page's light/dark section rhythm needs this block on the dark beat. */
 export default function TestimonialsSection({ dark = false }: { dark?: boolean }) {
-  const testimonials = [
-    {
-      quote: "The speed and quality of delivery are unmatched. They didn't just build a website, they built a scalable product foundation that our internal team now uses every day.",
-      author: "Sarah Jenkins",
-      role: "CTO at Creme Digital",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&auto=format&fit=crop"
-    },
-    {
-      quote: "Working with this team felt like having an elite engineering squad in-house. No hand-holding required. They understood our complex requirements immediately and shipped weeks ahead of schedule.",
-      author: "David Chen",
-      role: "Founder, Acme AI",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&auto=format&fit=crop"
-    },
-    {
-      quote: "Our conversion rate doubled after the redesign. The attention to detail in the micro-interactions and animations sets our brand apart from every competitor in the space.",
-      author: "Elena Rodriguez",
-      role: "VP of Marketing, FlowState",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&auto=format&fit=crop"
-    },
-    {
-      quote: "I've worked with dozens of agencies over the years. This is the first time I've experienced zero pushback on revisions and true pixel-perfect implementation of Figma designs.",
-      author: "Marcus Thorne",
-      role: "Product Lead, Quantum",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&auto=format&fit=crop"
-    },
-    {
-      quote: "They took our messy MVP and turned it into an enterprise-ready platform. The architecture choices they made saved us months of technical debt.",
-      author: "James Wilson",
-      role: "CEO, DataStream",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&auto=format&fit=crop"
-    },
-    {
-      quote: "The most seamless agency experience I've ever had. Transparent pricing, clear timelines, and the final result exceeded our extremely high expectations.",
-      author: "Priya Patel",
-      role: "Head of Design, Vertex",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&auto=format&fit=crop"
-    }
-  ];
-
   // Duplicate for infinite scroll
   const scrollItems = [...testimonials, ...testimonials];
 

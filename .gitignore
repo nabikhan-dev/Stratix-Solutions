@@ -43,3 +43,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase — never commit service account keys or SDK config files
+*-firebase-adminsdk-*.json
+*.firebase-adminsdk.json
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/
+
+# scratch/utility scripts — not part of the application
+src/scripts/seed.ts
+src/scripts/refactor.ts
+src/scripts/refactor2.js

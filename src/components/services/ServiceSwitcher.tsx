@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { primaryServices } from "@/data/content";
+import { type PrimaryService } from "@/data/content";
 import { DUR, RISE, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
@@ -20,16 +20,20 @@ const icons: Record<string, IconSvgElement> = {
   web: WebDesign02Icon,
 };
 
-export default function ServiceSwitcher() {
+export default function ServiceSwitcher({ services }: { services: PrimaryService[] }) {
   const [active, setActive] = useState(0);
-  const service = primaryServices[active];
+  const service = services[active];
+  
+  // If there are no services, just render an empty div
+  if (!service) return <div />;
+
   const icon = icons[service.id] ?? WebDesign02Icon;
 
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
       <div className="lg:col-span-5">
         <div className="border-y border-line">
-          {primaryServices.map((s, i) => {
+          {services.map((s, i) => {
             const isActive = active === i;
             return (
               <motion.button

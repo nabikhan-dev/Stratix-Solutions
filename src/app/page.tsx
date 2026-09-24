@@ -6,6 +6,7 @@ import TechStackSection from "@/components/agency-landing/TechStackSection";
 import ServicesSection from "@/components/agency-landing/ServicesSection";
 import ProjectsPortfolio from "@/components/agency-landing/ProjectsPortfolio";
 import ProcessOverview from "@/components/agency-landing/ProcessOverview";
+import { listProjects, listServices } from "@/lib/dashboard/store";
 
 import TestimonialsSection from "@/components/agency-landing/TestimonialsSection";
 
@@ -18,14 +19,17 @@ export const metadata: Metadata = {
     "A product engineering company that ships AI tools, mobile apps & web platforms at a fixed price. Weekly demos, scoped milestones, 90% on-time delivery. Book a free call.",
 };
 
-export default function Home() {
+export default async function Home() {
+  const projects = await listProjects();
+  const services = (await listServices()).filter(s => s.isActive !== false);
+
   return (
     <div className="min-h-screen bg-[var(--bg-void)] text-[var(--text-primary)] font-sans selection:bg-[var(--signal-soft)]">
       <main>
         <HeroSection />
-        <ServicesSection />
+        <ServicesSection services={services} />
         <TechStackSection />
-        <ProjectsPortfolio />
+        <ProjectsPortfolio projects={projects} />
         <ProcessOverview />
         <TestimonialsSection />
         <PricingPlans />

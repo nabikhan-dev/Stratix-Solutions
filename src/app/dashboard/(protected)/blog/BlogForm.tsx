@@ -1,26 +1,32 @@
 "use client";
 
-import { useActionState } from "react";
-import { Field, inputClass, FormError, buttonGhostClass } from "@/components/dashboard/ui";
+import { useActionState, useState } from "react";
+import { Plus, X } from "lucide-react";
+import { Field, inputClass, scrollableInputClass, FormError, buttonGhostClass, textareaClass} from "@/components/dashboard/ui";
 import SubmitButton from "@/components/dashboard/SubmitButton";
 import ImageUrlField from "@/components/dashboard/ImageUrlField";
+import CategoryCombobox from "@/components/dashboard/CategoryCombobox";
 import { serializeSections } from "@/lib/dashboard/sections";
-import { blogCategories, type BlogPost } from "@/data/blog";
+import { type BlogPost } from "@/data/blog";
 import Link from "next/link";
 import type { BlogFormState } from "./actions";
-
-const categoryOptions = blogCategories.filter((c) => c !== "All Insights");
 
 export default function BlogForm({
   mode,
   post,
   action,
+  existingCategories = [],
 }: {
   mode: "create" | "edit";
   post?: BlogPost;
+  existingCategories?: string[];
   action: (state: BlogFormState, formData: FormData) => Promise<BlogFormState>;
 }) {
   const [state, formAction] = useActionState<BlogFormState, FormData>(action, undefined);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(post?.gallery ?? [""]);
+
+  const addGalleryImage = () => setGalleryUrls([...galleryUrls, ""]);
+  const removeGalleryImage = (index: number) => setGalleryUrls(galleryUrls.filter((_, i) => i !== index));
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -28,7 +34,7 @@ export default function BlogForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Title" htmlFor="title">
-          <input id="title" name="title" required defaultValue={post?.title} className={inputClass} />
+          <textarea id="title" name="title" required defaultValue={post?.title} className={scrollableInputClass} data-lenis-prevent="true" />
         </Field>
 
         {mode === "create" ? (
@@ -41,37 +47,53 @@ export default function BlogForm({
           </Field>
         )}
 
-        <Field label="Category" htmlFor="category">
-          <select id="category" name="category" required defaultValue={post?.category} className={inputClass}>
-            <option value="" disabled>
-              Choose a category…
-            </option>
-            {categoryOptions.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+        <Field label="Category" htmlFor="category" hint='e.g. AI Development, Web Development'>
+          <CategoryCombobox required defaultValue={post?.category} existingCategories={existingCategories} />
         </Field>
 
         <Field label="Date" htmlFor="date" hint='e.g. "Aug 10, 2026"'>
           <input id="date" name="date" required defaultValue={post?.date} className={inputClass} />
         </Field>
-
-        <Field label="Read time" htmlFor="readTime" hint='e.g. "7 min read"'>
-          <input id="readTime" name="readTime" required defaultValue={post?.readTime} className={inputClass} />
-        </Field>
       </div>
 
       <ImageUrlField id="image" name="image" label="Cover image URL" defaultValue={post?.image} required />
 
-      <p className="-mt-2 text-[12.5px] text-faint">
-        Views aren&apos;t set here anymore — each post now tracks real visits live (see the site&apos;s
-        published post).
-      </p>
+      <div className="flex flex-col gap-3">
+        <label className="text-[14px] font-medium text-primary">Gallery images</label>
+        {galleryUrls.map((url, index) => (
+          <div key={index} className="flex items-start gap-2">
+            <div className="flex-1">
+              <ImageUrlField
+                id={`blog-gallery-${index}`}
+                name="gallery"
+                label=""
+                defaultValue={url}
+              />
+            </div>
+            {galleryUrls.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeGalleryImage(index)}
+                className="mt-1 flex size-10.5 shrink-0 items-center justify-center rounded-lg border border-line bg-surface text-muted transition hover:border-danger hover:text-danger"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addGalleryImage}
+          className="mt-2 flex w-max items-center gap-2 rounded-lg border border-line px-4 py-2 text-sm font-medium text-primary transition hover:bg-surface"
+        >
+          <Plus className="size-4" /> Add Gallery Image
+        </button>
+      </div>
+
+
 
       <Field label="Excerpt" htmlFor="excerpt">
-        <textarea id="excerpt" name="excerpt" required rows={2} defaultValue={post?.excerpt} className={inputClass} />
+        <textarea id="excerpt" name="excerpt" required rows={2} defaultValue={post?.excerpt} className={textareaClass} data-lenis-prevent="true" />
       </Field>
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -91,16 +113,16 @@ export default function BlogForm({
       <Field
         label="Body sections"
         htmlFor="sections"
-        hint={'Start a line with "## " to begin a new (optionally headed) section. Plain paragraphs before the first "## " become a heading-less intro section.'}
+        hint={'Start a line with "## " to begin a new section. Start a line with "IMAGE: https://..." to add an image. Plain paragraphs before the first "## " become a heading-less intro section.'}
       >
         <textarea
           id="sections"
           name="sections"
           required
-          rows={16}
           defaultValue={post ? serializeSections(post.sections) : ""}
-          className={`${inputClass} font-mono text-[13px] leading-relaxed`}
+          className="w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-primary placeholder:text-faint outline-none transition focus:border-signal focus-visible:!outline-none font-mono text-[13px] leading-relaxed resize-y overflow-y-auto h-96"
           placeholder={"## First section heading\nBody text for the first section.\n\n## Second section heading\nMore body text."}
+          data-lenis-prevent="true"
         />
       </Field>
 

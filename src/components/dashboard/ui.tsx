@@ -6,8 +6,18 @@ import Link from "next/link";
 // what keeps the dashboard's ~10 routes from duplicating the same styled
 // <div>/<input>/<button> boilerplate.
 
+// Single-line <input> — scrolls horizontally when text overflows
 export const inputClass =
-  "w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[14px] text-primary placeholder:text-faint outline-none transition focus:border-signal focus:ring-2 focus:ring-signal/15";
+  "w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[14px] text-primary placeholder:text-faint outline-none transition focus:border-signal focus-visible:!outline-none";
+
+// Use on <textarea> when you want it to look like a single-line input
+// but scroll internally when text overflows — same visual, vertical scroll
+export const scrollableInputClass =
+  "w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[14px] text-primary placeholder:text-faint outline-none transition focus:border-signal focus-visible:!outline-none resize-none overflow-y-auto leading-[1.5] h-[42px]";
+
+// Multi-line <textarea> — fixed height, scrolls inside the box (not the page)
+export const textareaClass =
+  "w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[14px] text-primary placeholder:text-faint outline-none transition focus:border-signal focus-visible:!outline-none overflow-y-auto min-h-[80px] max-h-[200px] resize-none";
 
 export const labelClass = "mb-1.5 block text-[13px] font-medium text-muted";
 
@@ -24,25 +34,40 @@ export function PageHeader({
   title,
   description,
   actions,
+  backLink,
+  backLabel,
 }: {
   title: string;
   description?: string;
   actions?: ReactNode;
+  backLink?: string;
+  backLabel?: string;
 }) {
   return (
-    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-primary">{title}</h1>
-        {description && <p className="mt-1.5 max-w-2xl text-[14px] text-muted">{description}</p>}
+    <div className="mb-8">
+      {backLink && (
+        <Link
+          href={backLink}
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-muted hover:text-primary transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+          {backLabel ?? "Back"}
+        </Link>
+      )}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-primary">{title}</h1>
+          {description && <p className="mt-1.5 max-w-2xl text-[14px] text-muted">{description}</p>}
+        </div>
+        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-line bg-surface p-6 ${className}`}>
+    <div className={`relative rounded-2xl border border-line bg-surface p-6 ${className}`}>
       {/* Hairline gradient top edge — the one recurring "unique" touch that
           ties every dashboard card back to the site's signal→aurora brand
           gradient, instead of a flat generic-admin border. */}

@@ -1,34 +1,12 @@
 import "server-only";
 
-import { blogPosts as seedBlogPosts, type BlogPost } from "@/data/blog";
-import { projects as seedProjects, type Project } from "@/data/projects";
-import {
-  primaryServices as seedPrimaryServices,
-  pricingTiers as seedPricingTiers,
-  contact as seedContact,
-  type PrimaryService,
-  type PricingTier,
-} from "@/data/content";
-import { featureCategories as seedFeatureCategories, type PricingCategory } from "@/data/pricing";
+import { getAdminDb } from "@/lib/firebase-admin";
 
-// ─────────────────────────────────────────────────────────────────────────
-// In-memory content store for /dashboard.
-//
-// There is no database wired up yet (see the conversation that scoped this:
-// "build the UI first, decide on persistence later"). Each collection below
-// is a module-level array, seeded once from the same src/data/*.ts files the
-// public site renders from, then mutated in place by dashboard Server
-// Actions via revalidatePath.
-//
-// What that buys you: the dashboard actually works end-to-end in a running
-// dev/prod server — create, edit, delete all visibly persist while you
-// click around. What it does NOT do: survive a server restart, a redeploy,
-// or serverless cold starts (each instance gets its own copy of this
-// module). Treat this as a working prototype of the UI/UX, not a
-// production data layer. Swapping in a real database means replacing the
-// functions in this file with query calls — the dashboard pages and
-// actions that call them shouldn't need to change shape.
-// ─────────────────────────────────────────────────────────────────────────
+import type { BlogPost } from "@/data/blog";
+import type { Project } from "@/data/projects";
+import type { Testimonial } from "@/data/testimonials";
+import type { PrimaryService, PricingTier } from "@/data/content";
+import type { PricingCategory } from "@/data/pricing";
 
 export type SiteSettings = {
   siteTitle: string;
@@ -38,24 +16,6 @@ export type SiteSettings = {
   responseTime: string;
   serving: string;
   contactNote: string;
-};
-
-const state = {
-  blogPosts: seedBlogPosts.map((p) => ({ ...p })) as BlogPost[],
-  projects: seedProjects.map((p) => ({ ...p })) as Project[],
-  services: seedPrimaryServices.map((s) => ({ ...s })) as PrimaryService[],
-  pricingTiers: seedPricingTiers.map((t) => ({ ...t })) as PricingTier[],
-  featureCategories: seedFeatureCategories.map((c) => ({ ...c, options: [...c.options] })) as PricingCategory[],
-  settings: {
-    siteTitle: "Stratix Solutions — AI, UI/UX, app, and web development",
-    siteDescription:
-      "AI development, UI/UX design, app development, and responsive web development services. Strategy, design, engineering, QA, release, and support handled by one focused team.",
-    ogImage: "/og-image.png",
-    contactEmail: seedContact.email,
-    responseTime: seedContact.responseTime,
-    serving: seedContact.serving,
-    contactNote: seedContact.note,
-  } satisfies SiteSettings,
 };
 
 function slugify(input: string): string {
@@ -68,145 +28,266 @@ function slugify(input: string): string {
 
 // ── Blog ────────────────────────────────────────────────────────────────
 
-export function listBlogPosts(): BlogPost[] {
-  return state.blogPosts;
+export async function listBlogPosts(): Promise<BlogPost[]> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("blogPosts").get();
+  return snapshot.docs.map((d) => d.data() as BlogPost);
 }
 
-export function getBlogPost(slug: string): BlogPost | undefined {
-  return state.blogPosts.find((p) => p.slug === slug);
+export async function getBlogPost(slug: string): Promise<BlogPost | undefined> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("blogPosts").doc(slug).get();
+  return snapshot.exists ? (snapshot.data() as BlogPost) : undefined;
 }
 
-export function createBlogPost(input: Omit<BlogPost, "slug"> & { slug?: string }): BlogPost {
+export async function createBlogPost(
+  input: Omit<BlogPost, "slug"> & { slug?: string }
+): Promise<BlogPost> {
+  const db = getAdminDb();
   const slug = input.slug?.trim() || slugify(input.title);
-  if (state.blogPosts.some((p) => p.slug === slug)) {
+  const ref = db.collection("blogPosts").doc(slug);
+  const snapshot = await ref.get();
+  if (snapshot.exists) {
     throw new Error(`A post with slug "${slug}" already exists.`);
   }
-  const post: BlogPost = { ...input, slug };
-  state.blogPosts = [post, ...state.blogPosts];
+  const post = { ...input, slug } as BlogPost;
+  await ref.set(post);
   return post;
 }
 
-export function updateBlogPost(slug: string, input: Partial<Omit<BlogPost, "slug">>): BlogPost {
-  const index = state.blogPosts.findIndex((p) => p.slug === slug);
-  if (index === -1) throw new Error(`No post found with slug "${slug}".`);
-  const updated = { ...state.blogPosts[index], ...input };
-  state.blogPosts = state.blogPosts.map((p, i) => (i === index ? updated : p));
-  return updated;
+export async function updateBlogPost(
+  slug: string,
+  input: Partial<Omit<BlogPost, "slug">>
+): Promise<BlogPost> {
+  const db = getAdminDb();
+  const ref = db.collection("blogPosts").doc(slug);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) throw new Error(`No post found with slug "${slug}".`);
+  await ref.update(input);
+  return { ...snapshot.data(), ...input } as BlogPost;
 }
 
-export function deleteBlogPost(slug: string): void {
-  state.blogPosts = state.blogPosts.filter((p) => p.slug !== slug);
+export async function deleteBlogPost(slug: string): Promise<void> {
+  const db = getAdminDb();
+  await db.collection("blogPosts").doc(slug).delete();
 }
 
 // ── Projects ────────────────────────────────────────────────────────────
 
-export function listProjects(): Project[] {
-  return state.projects;
+export async function listProjects(): Promise<Project[]> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("projects").get();
+  return snapshot.docs.map((d) => d.data() as Project);
 }
 
-export function getProject(id: number): Project | undefined {
-  return state.projects.find((p) => p.id === id);
+export async function getProject(id: number): Promise<Project | undefined> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("projects").doc(id.toString()).get();
+  return snapshot.exists ? (snapshot.data() as Project) : undefined;
 }
 
-export function createProject(input: Omit<Project, "id">): Project {
-  const nextId = state.projects.reduce((max, p) => Math.max(max, p.id), 0) + 1;
-  const project: Project = { ...input, id: nextId };
-  state.projects = [...state.projects, project];
+export async function createProject(
+  input: Omit<Project, "id">
+): Promise<Project> {
+  const db = getAdminDb();
+  const projects = await listProjects();
+  const nextId = projects.reduce((max, p) => Math.max(max, p.id), 0) + 1;
+  const project = { ...input, id: nextId } as Project;
+  await db.collection("projects").doc(nextId.toString()).set(project);
   return project;
 }
 
-export function updateProject(id: number, input: Partial<Omit<Project, "id">>): Project {
-  const index = state.projects.findIndex((p) => p.id === id);
-  if (index === -1) throw new Error(`No project found with id ${id}.`);
-  const updated = { ...state.projects[index], ...input };
-  state.projects = state.projects.map((p, i) => (i === index ? updated : p));
-  return updated;
+export async function updateProject(
+  id: number,
+  input: Partial<Omit<Project, "id">>
+): Promise<Project> {
+  const db = getAdminDb();
+  const ref = db.collection("projects").doc(id.toString());
+  const snapshot = await ref.get();
+  if (!snapshot.exists) throw new Error(`No project found with id ${id}.`);
+  await ref.update(input);
+  return { ...snapshot.data(), ...input } as Project;
 }
 
-export function deleteProject(id: number): void {
-  state.projects = state.projects.filter((p) => p.id !== id);
+export async function deleteProject(id: number): Promise<void> {
+  const db = getAdminDb();
+  await db.collection("projects").doc(id.toString()).delete();
+}
+
+// ── Testimonials ────────────────────────────────────────────────────────
+
+export async function listTestimonials(): Promise<Testimonial[]> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("testimonials").get();
+  return snapshot.docs.map((d) => d.data() as Testimonial);
+}
+
+export async function getTestimonial(
+  id: string
+): Promise<Testimonial | undefined> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("testimonials").doc(id).get();
+  return snapshot.exists ? (snapshot.data() as Testimonial) : undefined;
+}
+
+export async function createTestimonial(
+  input: Omit<Testimonial, "id">
+): Promise<Testimonial> {
+  const db = getAdminDb();
+  const id = Date.now().toString();
+  const testimonial = { ...input, id } as Testimonial;
+  await db.collection("testimonials").doc(id).set(testimonial);
+  return testimonial;
+}
+
+export async function updateTestimonial(
+  id: string,
+  input: Partial<Omit<Testimonial, "id">>
+): Promise<Testimonial> {
+  const db = getAdminDb();
+  const ref = db.collection("testimonials").doc(id);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) throw new Error(`No testimonial found with id ${id}.`);
+  await ref.update(input);
+  return { ...snapshot.data(), ...input } as Testimonial;
+}
+
+export async function deleteTestimonial(id: string): Promise<void> {
+  const db = getAdminDb();
+  await db.collection("testimonials").doc(id).delete();
 }
 
 // ── Services ────────────────────────────────────────────────────────────
 
-export function listServices(): PrimaryService[] {
-  return state.services;
+export async function listServices(): Promise<PrimaryService[]> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("services").get();
+  return snapshot.docs.map((d) => d.data() as PrimaryService);
 }
 
-export function getService(id: string): PrimaryService | undefined {
-  return state.services.find((s) => s.id === id);
+export async function getService(
+  id: string
+): Promise<PrimaryService | undefined> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("services").doc(id).get();
+  return snapshot.exists ? (snapshot.data() as PrimaryService) : undefined;
 }
 
-export function updateService(id: string, input: Partial<Omit<PrimaryService, "id">>): PrimaryService {
-  const index = state.services.findIndex((s) => s.id === id);
-  if (index === -1) throw new Error(`No service found with id "${id}".`);
-  const updated = { ...state.services[index], ...input };
-  state.services = state.services.map((s, i) => (i === index ? updated : s));
-  return updated;
+export async function updateService(
+  id: string,
+  input: Partial<Omit<PrimaryService, "id">>
+): Promise<PrimaryService> {
+  const db = getAdminDb();
+  const ref = db.collection("services").doc(id);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) throw new Error(`No service found with id "${id}".`);
+  await ref.update(input);
+  return { ...snapshot.data(), ...input } as PrimaryService;
 }
 
-// ── Pricing tiers (MVP packages) ───────────────────────────────────────
+// ── Pricing tiers ───────────────────────────────────────────────────────
 
-export function listPricingTiers(): PricingTier[] {
-  return state.pricingTiers;
+export async function listPricingTiers(): Promise<PricingTier[]> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("pricingTiers").get();
+  return snapshot.docs.map((d) => d.data() as PricingTier);
 }
 
-export function updatePricingTier(id: string, input: Partial<Omit<PricingTier, "id">>): PricingTier {
-  const index = state.pricingTiers.findIndex((t) => t.id === id);
-  if (index === -1) throw new Error(`No pricing tier found with id "${id}".`);
-  const updated = { ...state.pricingTiers[index], ...input };
-  state.pricingTiers = state.pricingTiers.map((t, i) => (i === index ? updated : t));
-  return updated;
+export async function updatePricingTier(
+  id: string,
+  input: Partial<Omit<PricingTier, "id">>
+): Promise<PricingTier> {
+  const db = getAdminDb();
+  const ref = db.collection("pricingTiers").doc(id);
+  const snapshot = await ref.get();
+  if (!snapshot.exists)
+    throw new Error(`No pricing tier found with id "${id}".`);
+  await ref.update(input);
+  return { ...snapshot.data(), ...input } as PricingTier;
 }
 
-// ── Pricing calculator categories/options ──────────────────────────────
+// ── Feature categories/options ──────────────────────────────────────────
 
-export function listFeatureCategories(): PricingCategory[] {
-  return state.featureCategories;
+export async function listFeatureCategories(): Promise<PricingCategory[]> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("featureCategories").get();
+  return snapshot.docs.map((d) => d.data() as PricingCategory);
 }
 
-export function getFeatureCategory(categoryId: string): PricingCategory | undefined {
-  return state.featureCategories.find((c) => c.id === categoryId);
+export async function getFeatureCategory(
+  categoryId: string
+): Promise<PricingCategory | undefined> {
+  const db = getAdminDb();
+  const snapshot = await db
+    .collection("featureCategories")
+    .doc(categoryId)
+    .get();
+  return snapshot.exists ? (snapshot.data() as PricingCategory) : undefined;
 }
 
-export function updateFeatureOption(
+export async function updateFeatureOption(
   categoryId: string,
   optionId: string,
   input: { name?: string; price?: number }
-): void {
-  state.featureCategories = state.featureCategories.map((cat) => {
-    if (cat.id !== categoryId) return cat;
-    return {
-      ...cat,
-      options: cat.options.map((opt) => (opt.id === optionId ? { ...opt, ...input } : opt)),
-    };
-  });
-}
-
-export function createFeatureOption(categoryId: string, name: string, price: number): void {
-  const id = slugify(name) || `option-${Date.now()}`;
-  state.featureCategories = state.featureCategories.map((cat) => {
-    if (cat.id !== categoryId) return cat;
-    if (cat.options.some((o) => o.id === id)) {
-      throw new Error(`"${name}" already exists in ${cat.name}.`);
-    }
-    return { ...cat, options: [...cat.options, { id, name, price }] };
-  });
-}
-
-export function deleteFeatureOption(categoryId: string, optionId: string): void {
-  state.featureCategories = state.featureCategories.map((cat) =>
-    cat.id === categoryId ? { ...cat, options: cat.options.filter((o) => o.id !== optionId) } : cat
+): Promise<void> {
+  const db = getAdminDb();
+  const ref = db.collection("featureCategories").doc(categoryId);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) return;
+  const cat = snapshot.data() as PricingCategory;
+  const newOptions = cat.options.map((opt) =>
+    opt.id === optionId ? { ...opt, ...input } : opt
   );
+  await ref.update({ options: newOptions });
+}
+
+export async function createFeatureOption(
+  categoryId: string,
+  name: string,
+  price: number
+): Promise<void> {
+  const db = getAdminDb();
+  const id = slugify(name) || `option-${Date.now()}`;
+  const ref = db.collection("featureCategories").doc(categoryId);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) return;
+  const cat = snapshot.data() as PricingCategory;
+  if (cat.options.some((o) => o.id === id)) {
+    throw new Error(`"${name}" already exists in ${cat.name}.`);
+  }
+  await ref.update({ options: [...cat.options, { id, name, price }] });
+}
+
+export async function deleteFeatureOption(
+  categoryId: string,
+  optionId: string
+): Promise<void> {
+  const db = getAdminDb();
+  const ref = db.collection("featureCategories").doc(categoryId);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) return;
+  const cat = snapshot.data() as PricingCategory;
+  await ref.update({
+    options: cat.options.filter((o) => o.id !== optionId),
+  });
 }
 
 // ── Site settings ───────────────────────────────────────────────────────
 
-export function getSettings(): SiteSettings {
-  return state.settings;
+export async function getSettings(): Promise<SiteSettings> {
+  const db = getAdminDb();
+  const snapshot = await db.collection("settings").doc("main").get();
+  return snapshot.data() as SiteSettings;
 }
 
-export function updateSettings(input: Partial<SiteSettings>): SiteSettings {
-  state.settings = { ...state.settings, ...input };
-  return state.settings;
+export async function updateSettings(
+  input: Partial<SiteSettings>
+): Promise<SiteSettings> {
+  const db = getAdminDb();
+  const ref = db.collection("settings").doc("main");
+  const snapshot = await ref.get();
+  const current = snapshot.exists ? (snapshot.data() as SiteSettings) : ({} as SiteSettings);
+  const updated = { ...current, ...input };
+  await ref.set(updated);
+  return updated;
 }

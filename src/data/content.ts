@@ -23,6 +23,7 @@ export type PrimaryService = {
   short: string;
   description: string;
   motifWords: string[];
+  isActive?: boolean;
 };
 
 export const primaryServices: PrimaryService[] = [
@@ -207,6 +208,7 @@ export type PricingTier = {
   /** Rendered as the card's "Build with:" group, below the feature checklist. */
   stack: string[];
   features: string[];
+  isActive?: boolean;
 };
 
 export const pricingTiers: PricingTier[] = [

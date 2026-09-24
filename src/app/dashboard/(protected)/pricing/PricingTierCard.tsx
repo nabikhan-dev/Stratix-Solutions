@@ -6,7 +6,7 @@ import SubmitButton from "@/components/dashboard/SubmitButton";
 import { updatePricingTierAction, type PricingFormState } from "./actions";
 import type { PricingTier } from "@/data/content";
 
-export default function PricingTierCard({ tier }: { tier: PricingTier }) {
+export default function PricingTierCard({ tier, allFeatures }: { tier: PricingTier; allFeatures: string[] }) {
   const [state, formAction] = useActionState<PricingFormState, FormData>(updatePricingTierAction, undefined);
 
   return (
@@ -27,14 +27,35 @@ export default function PricingTierCard({ tier }: { tier: PricingTier }) {
           </Field>
         </div>
 
-        <Field label="Features" htmlFor={`features-${tier.id}`} hint="One per line.">
-          <textarea
-            id={`features-${tier.id}`}
-            name="features"
-            rows={5}
-            defaultValue={tier.features.join("\n")}
-            className={inputClass}
-          />
+        <Field label="Features" htmlFor={`features-${tier.id}`} hint="Check to enable, and edit text if needed.">
+          <div className="flex flex-col gap-2">
+            {allFeatures.map((feature, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name={`feature_enabled_${i}`}
+                  value="true"
+                  defaultChecked={tier.features.includes(feature)}
+                  className="h-4 w-4 shrink-0 rounded border-line text-signal focus:ring-signal"
+                />
+                <input
+                  type="text"
+                  name={`feature_text_${i}`}
+                  defaultValue={feature}
+                  className={`${inputClass} flex-1 py-1.5 text-[13px]`}
+                />
+              </div>
+            ))}
+            <div className="mt-1 flex items-center gap-2">
+              <div className="h-4 w-4 shrink-0" />
+              <input
+                type="text"
+                name="newFeature"
+                placeholder="Add a new feature..."
+                className={`${inputClass} flex-1 py-1.5 text-[13px]`}
+              />
+            </div>
+          </div>
         </Field>
 
         <FormError message={state?.error} />

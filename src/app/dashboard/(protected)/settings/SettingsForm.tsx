@@ -1,12 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
-import { Card, Field, inputClass, FormError } from "@/components/dashboard/ui";
+import { Card, Field, inputClass, FormError, textareaClass} from "@/components/dashboard/ui";
 import SubmitButton from "@/components/dashboard/SubmitButton";
 import { updateSettingsAction, type SettingsFormState } from "./actions";
 import type { SiteSettings } from "@/lib/dashboard/store";
 
-export default function SettingsForm({ settings }: { settings: SiteSettings }) {
+export default async function SettingsForm({ settings }: { settings: SiteSettings }) {
   const [state, formAction] = useActionState<SettingsFormState, FormData>(updateSettingsAction, undefined);
 
   return (
@@ -23,7 +23,8 @@ export default function SettingsForm({ settings }: { settings: SiteSettings }) {
             required
             rows={3}
             defaultValue={settings.siteDescription}
-            className={inputClass}
+            className={textareaClass}
+            data-lenis-prevent="true"
           />
         </Field>
 
@@ -45,7 +46,7 @@ export default function SettingsForm({ settings }: { settings: SiteSettings }) {
         </Field>
 
         <Field label="Contact form note" htmlFor="contactNote">
-          <textarea id="contactNote" name="contactNote" rows={3} defaultValue={settings.contactNote} className={inputClass} />
+          <textarea id="contactNote" name="contactNote" rows={3} defaultValue={settings.contactNote} className={textareaClass} data-lenis-prevent="true" />
         </Field>
 
         <FormError message={state?.error} />

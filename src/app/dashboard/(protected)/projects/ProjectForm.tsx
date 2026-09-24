@@ -1,10 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
-import { Field, inputClass, FormError, buttonGhostClass } from "@/components/dashboard/ui";
+import { Plus, X } from "lucide-react";
+import { Field, inputClass, FormError, buttonGhostClass, textareaClass} from "@/components/dashboard/ui";
 import SubmitButton from "@/components/dashboard/SubmitButton";
 import ImageUrlField from "@/components/dashboard/ImageUrlField";
+import CategoryCombobox from "@/components/dashboard/CategoryCombobox";
 import type { Project } from "@/data/projects";
 import type { ProjectFormState } from "./actions";
 
@@ -12,12 +14,18 @@ export default function ProjectForm({
   mode,
   project,
   action,
+  existingCategories = [],
 }: {
   mode: "create" | "edit";
   project?: Project;
+  existingCategories?: string[];
   action: (state: ProjectFormState, formData: FormData) => Promise<ProjectFormState>;
 }) {
   const [state, formAction] = useActionState<ProjectFormState, FormData>(action, undefined);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(project?.gallery ?? [""]);
+
+  const addGalleryImage = () => setGalleryUrls([...galleryUrls, ""]);
+  const removeGalleryImage = (index: number) => setGalleryUrls(galleryUrls.filter((_, i) => i !== index));
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -28,21 +36,57 @@ export default function ProjectForm({
       </Field>
 
       <Field label="Description" htmlFor="description">
-        <textarea id="description" name="description" required rows={3} defaultValue={project?.description} className={inputClass} />
+        <textarea id="description" name="description" required rows={3} defaultValue={project?.description} className={textareaClass} data-lenis-prevent="true" />
       </Field>
 
       <Field label="Tags" htmlFor="tags" hint="Comma-separated, e.g. Figma Design, Next.js, Tailwind CSS">
         <input id="tags" name="tags" defaultValue={project?.tags.join(", ")} className={inputClass} />
       </Field>
 
-      <ImageUrlField id="image" name="image" label="Cover image" defaultValue={project?.image} required />
-
-      <Field label="Gallery images" htmlFor="gallery" hint="One image URL per line.">
-        <textarea id="gallery" name="gallery" rows={4} defaultValue={project?.gallery.join("\n")} className={`${inputClass} font-mono text-[13px]`} />
+      <Field label="Category" htmlFor="category" hint='e.g. Websites, Mobile Apps, Digital Strategy'>
+        <CategoryCombobox defaultValue={project?.category} existingCategories={existingCategories} />
       </Field>
 
+      <Field label="Live URL" htmlFor="url" hint="Optional link to the live project (e.g. https://example.com)">
+        <input id="url" name="url" type="url" defaultValue={project?.url} className={inputClass} />
+      </Field>
+
+      <ImageUrlField id="image" name="image" label="Cover image" defaultValue={project?.image} required />
+
+      <div className="flex flex-col gap-3">
+        <label className="text-[14px] font-medium text-primary">Gallery images</label>
+        {galleryUrls.map((url, index) => (
+          <div key={index} className="flex items-start gap-2">
+            <div className="flex-1">
+              <ImageUrlField
+                id={`gallery-${index}`}
+                name="gallery"
+                label=""
+                defaultValue={url}
+              />
+            </div>
+            {galleryUrls.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeGalleryImage(index)}
+                className="mt-1 flex size-10.5 shrink-0 items-center justify-center rounded-lg border border-line bg-surface text-muted transition hover:border-danger hover:text-danger"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addGalleryImage}
+          className="mt-2 flex w-max items-center gap-2 rounded-lg border border-line px-4 py-2 text-sm font-medium text-primary transition hover:bg-surface"
+        >
+          <Plus className="size-4" /> Add Gallery Image
+        </button>
+      </div>
+
       <Field label="Results" htmlFor="results" hint="One result per line, e.g. Increased conversion by 340%">
-        <textarea id="results" name="results" rows={5} defaultValue={project?.results.join("\n")} className={inputClass} />
+        <textarea id="results" name="results" rows={5} defaultValue={project?.results?.join("\n")} className={textareaClass} data-lenis-prevent="true" />
       </Field>
 
       <div className="grid gap-5 sm:grid-cols-2">

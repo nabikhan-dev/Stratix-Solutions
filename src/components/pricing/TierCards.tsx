@@ -5,25 +5,23 @@ import { motion } from "framer-motion";
 import { Check, Minus, Sparkles } from "lucide-react";
 import { DUR, STAGGER, enter } from "@/lib/motion";
 import Reveal from "@/components/motion/Reveal";
-import { pricingTiers, type PricingTier } from "@/data/content";
+import { type PricingTier } from "@/data/content";
 
+export default function TierCards({ tiers }: { tiers: PricingTier[] }) {
+  const allFeatures = Array.from(new Set(tiers.flatMap((t) => t.features)));
 
-const allFeatures = Array.from(new Set(pricingTiers.flatMap((t) => t.features)));
-
-
-export default function TierCards() {
   return (
     <div className="grid items-start gap-5 md:grid-cols-3">
-      {pricingTiers.map((t, i) => (
+      {tiers.map((t, i) => (
         <Reveal key={t.id} delay={i * STAGGER}>
-          <TierCard tier={t} featured={i === 1} />
+          <TierCard tier={t} featured={i === 1} allFeatures={allFeatures} />
         </Reveal>
       ))}
     </div>
   );
 }
 
-function TierCard({ tier, featured }: { tier: PricingTier; featured: boolean }) {
+function TierCard({ tier, featured, allFeatures }: { tier: PricingTier; featured: boolean; allFeatures: string[] }) {
   const included = new Set(tier.features);
 
   return (

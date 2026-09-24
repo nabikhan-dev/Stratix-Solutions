@@ -3,9 +3,10 @@ import { listPricingTiers, listFeatureCategories } from "@/lib/dashboard/store";
 import PricingTierCard from "./PricingTierCard";
 import CategoryEditor from "./CategoryEditor";
 
-export default function DashboardPricingPage() {
-  const tiers = listPricingTiers();
-  const categories = listFeatureCategories();
+export default async function DashboardPricingPage() {
+  const tiers = await listPricingTiers();
+  const categories = await listFeatureCategories();
+  const allFeatures = Array.from(new Set(tiers.flatMap((t) => t.features)));
 
   return (
     <div>
@@ -14,7 +15,7 @@ export default function DashboardPricingPage() {
       <h2 className="mb-3 text-[15px] font-semibold text-primary">MVP packages</h2>
       <div className="grid gap-5 sm:grid-cols-3">
         {tiers.map((tier) => (
-          <PricingTierCard key={tier.id} tier={tier} />
+          <PricingTierCard key={tier.id} tier={tier} allFeatures={allFeatures} />
         ))}
       </div>
 

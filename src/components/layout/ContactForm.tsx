@@ -86,6 +86,7 @@ export default function ContactForm() {
           {...fieldProps("message", errors.message)}
           rows={5}
           placeholder="Tell us about your AI, UI/UX, app, or web project — what it does, who it’s for, and any deadline you’re working toward."
+          data-lenis-prevent="true"
         />
       </Field>
 

@@ -17,7 +17,7 @@ export async function updateSettingsAction(_prevState: SettingsFormState, formDa
   if (!siteDescription) return { error: "Site description is required." };
   if (!contactEmail.includes("@")) return { error: "Enter a valid contact email." };
 
-  updateSettings({
+  await updateSettings({
     siteTitle,
     siteDescription,
     ogImage: String(formData.get("ogImage") ?? "").trim(),

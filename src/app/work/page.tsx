@@ -6,6 +6,7 @@ import FullVisibilityTimeline from "@/components/work/FullVisibilityTimeline";
 import WeekByWeek from "@/components/work/WeekByWeek";
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pageHeroes } from "@/data/copy";
+import { listProjects } from "@/lib/dashboard/store";
 
 export const metadata: Metadata = {
   title: "Our Work | Shipped Products & Results  Stratix Solution",
@@ -20,7 +21,9 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function WorkPage() {
+export default async function WorkPage() {
+  const projects = await listProjects();
+
   return (
     <div className="min-h-screen bg-surface">
       <main>
@@ -31,7 +34,7 @@ export default function WorkPage() {
           description={pageHeroes.work.description}
         />
 
-        <WorkPortfolio />
+        <WorkPortfolio projects={projects} />
         <FullVisibilityTimeline />
         <WeekByWeek />
 

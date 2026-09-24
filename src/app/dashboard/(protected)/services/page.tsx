@@ -2,8 +2,8 @@ import { PageHeader } from "@/components/dashboard/ui";
 import { listServices } from "@/lib/dashboard/store";
 import ServiceEditCard from "./ServiceEditCard";
 
-export default function DashboardServicesPage() {
-  const services = listServices();
+export default async function DashboardServicesPage() {
+  const services = await listServices();
 
   return (
     <div>

@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CircleCheckBig } from "lucide-react";
-import { projects } from "@/data/projects";
+import { ArrowLeft, CircleCheckBig, ArrowUpRight } from "lucide-react";
+import { listProjects, getProject } from "@/lib/dashboard/store";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const projects = await listProjects();
   return projects.map((p) => ({
     id: p.id.toString(),
   }));
@@ -14,7 +15,7 @@ export function generateStaticParams() {
 
 export default async function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const project = projects.find((p) => p.id.toString() === id);
+  const project = await getProject(Number(id));
 
   if (!project) {
     notFound();
@@ -61,19 +62,40 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
               {project.description}
             </p>
           </Reveal>
+
+          {project.metric && (project.metric.value || project.metric.label) && (
+            <Reveal delay={0.18}>
+              <div className="mt-8 inline-flex flex-col rounded-[24px] border border-signal bg-signal px-8 py-5">
+                <span className="text-4xl font-bold tracking-tight text-white">{project.metric.value}</span>
+                <span className="mt-1 text-xs font-medium uppercase tracking-widest text-white/80">{project.metric.label}</span>
+              </div>
+            </Reveal>
+          )}
+
+          {project.url && (
+            <Reveal delay={0.2}>
+              <div className="mt-8">
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-surface transition-all hover:scale-105"
+                >
+                  Visit Live Site <ArrowUpRight className="h-4 w-4" />
+                </a>
+              </div>
+            </Reveal>
+          )}
         </div>
       </div>
 
       <Reveal delay={0.25}>
         <div className="container-px mx-auto mt-12 w-full max-w-[1440px]">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-[32px] border border-line shadow-xl">
-            <Image
+          <div className="relative overflow-hidden rounded-[32px] border border-line shadow-xl">
+            <img
               src={project.image}
               alt={project.title}
-              fill
-              sizes="(min-width: 1440px) 1248px, 90vw"
-              priority
-              className="object-cover"
+              className="block w-full h-auto"
             />
           </div>
         </div>
@@ -86,14 +108,12 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
               <Reveal
                 key={idx}
                 delay={idx * STAGGER}
-                className="group relative aspect-video overflow-hidden rounded-[20px] border border-line"
+                className="group relative overflow-hidden rounded-[20px] border border-line"
               >
-                <Image
+                <img
                   src={img}
                   alt={`${project.title} gallery image ${idx + 1}`}
-                  fill
-                  sizes="(min-width: 1440px) 612px, (min-width: 768px) 45vw, 100vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               </Reveal>
             ))}
@@ -103,25 +123,23 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
 
       {project.results && project.results.length > 0 && (
         <div className="container-px relative z-10 mx-auto mt-16 w-full max-w-[1440px]">
-          <div className="mx-auto max-w-4xl">
-            <Reveal>
-              <div>
-                <h2 className="mb-5 text-2xl font-semibold tracking-[-0.03em] text-primary">
-                  Results &amp; Impact
-                </h2>
-                <ul className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
-                  {project.results.map((result, idx) => (
-                    <Reveal as="li" key={idx} delay={idx * STAGGER} className="flex items-start gap-3">
-                      <CircleCheckBig className="mt-1 h-5 w-5 shrink-0 text-signal" strokeWidth={2.5} />
-                      <span className="text-[17px] leading-8 text-muted">
-                        {result}
-                      </span>
-                    </Reveal>
-                  ))}
-                </ul>
-              </div>
-            </Reveal>
-          </div>
+          <Reveal>
+            <div>
+              <h2 className="mb-5 text-2xl font-semibold tracking-[-0.03em] text-primary">
+                Results &amp; Impact
+              </h2>
+              <ul className="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
+                {project.results.map((result, idx) => (
+                  <Reveal as="li" key={idx} delay={idx * STAGGER} className="flex items-start gap-3">
+                    <CircleCheckBig className="mt-0.5 h-5 w-5 shrink-0 text-signal" strokeWidth={2} />
+                    <span className="text-[15px] leading-relaxed text-muted">
+                      {result}
+                    </span>
+                  </Reveal>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
         </div>
       )}
     </article>

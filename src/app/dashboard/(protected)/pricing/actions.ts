@@ -18,21 +18,34 @@ export async function updatePricingTierAction(_prevState: PricingFormState, form
   const name = String(formData.get("name") ?? "").trim();
   const price = String(formData.get("price") ?? "").trim();
   const timeline = String(formData.get("timeline") ?? "").trim();
-  const features = String(formData.get("features") ?? "")
-    .split("\n")
-    .map((f) => f.trim())
-    .filter(Boolean);
+  
+  const features: string[] = [];
+  
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith("feature_enabled_") && value === "true") {
+      const index = key.replace("feature_enabled_", "");
+      const text = String(formData.get(`feature_text_${index}`) ?? "").trim();
+      if (text && !features.includes(text)) {
+        features.push(text);
+      }
+    }
+  }
+
+  const newFeature = String(formData.get("newFeature") ?? "").trim();
+  if (newFeature && !features.includes(newFeature)) {
+    features.push(newFeature);
+  }
 
   if (!name) return { error: "Name is required." };
   if (!price) return { error: "Price is required." };
 
   try {
-    updatePricingTier(id, { name, price, timeline, features });
+    await updatePricingTier(id, { name, price, timeline, features });
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't save this tier." };
   }
 
-  revalidatePath("/dashboard/pricing");
+  revalidatePath("/", "layout");
   return { savedAt: Date.now() };
 }
 
@@ -44,9 +57,9 @@ export async function updateFeatureOptionAction(formData: FormData) {
   const price = Number(formData.get("price"));
 
   if (categoryId && optionId && name && Number.isFinite(price)) {
-    updateFeatureOption(categoryId, optionId, { name, price });
+    await updateFeatureOption(categoryId, optionId, { name, price });
   }
-  revalidatePath("/dashboard/pricing");
+  revalidatePath("/", "layout");
 }
 
 export async function createFeatureOptionAction(formData: FormData) {
@@ -56,15 +69,15 @@ export async function createFeatureOptionAction(formData: FormData) {
   const price = Number(formData.get("price"));
 
   if (categoryId && name && Number.isFinite(price)) {
-    createFeatureOption(categoryId, name, price);
+    await createFeatureOption(categoryId, name, price);
   }
-  revalidatePath("/dashboard/pricing");
+  revalidatePath("/", "layout");
 }
 
 export async function deleteFeatureOptionAction(formData: FormData) {
   await requireSession();
   const categoryId = String(formData.get("categoryId") ?? "");
   const optionId = String(formData.get("optionId") ?? "");
-  deleteFeatureOption(categoryId, optionId);
-  revalidatePath("/dashboard/pricing");
+  await deleteFeatureOption(categoryId, optionId);
+  revalidatePath("/", "layout");
 }

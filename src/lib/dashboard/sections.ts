@@ -12,18 +12,29 @@ export function parseSections(text: string): BlogSection[] {
   const lines = text.split("\n");
   const sections: BlogSection[] = [];
   let heading: string | undefined;
+  let images: string[] = [];
   let body: string[] = [];
 
   const flush = () => {
     const trimmed = body.join("\n").trim();
-    if (trimmed || heading) sections.push({ heading, body: trimmed });
+    if (trimmed || heading || images.length > 0) {
+      const section: BlogSection = { body: trimmed, images: [...images] };
+      if (heading !== undefined) {
+        section.heading = heading;
+      }
+      sections.push(section);
+    }
     body = [];
+    images = [];
+    heading = undefined;
   };
 
   for (const line of lines) {
     if (line.startsWith("## ")) {
       flush();
       heading = line.slice(3).trim();
+    } else if (line.startsWith("IMAGE: ")) {
+      images.push(line.slice(7).trim());
     } else {
       body.push(line);
     }
@@ -34,5 +45,15 @@ export function parseSections(text: string): BlogSection[] {
 }
 
 export function serializeSections(sections: BlogSection[]): string {
-  return sections.map((s) => (s.heading ? `## ${s.heading}\n${s.body}` : s.body)).join("\n\n");
+  return sections
+    .map((s) => {
+      const parts = [];
+      if (s.heading) parts.push(`## ${s.heading}`);
+      if (s.images && s.images.length > 0) {
+        s.images.forEach((img) => parts.push(`IMAGE: ${img}`));
+      }
+      if (s.body) parts.push(s.body);
+      return parts.join("\n");
+    })
+    .join("\n\n");
 }

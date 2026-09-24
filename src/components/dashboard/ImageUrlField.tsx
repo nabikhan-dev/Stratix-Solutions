@@ -55,7 +55,7 @@ export default function ImageUrlField({
         <input
           id={id}
           name={name}
-          type="url"
+          type="text"
           required={required}
           value={url}
           onChange={(e) => {

@@ -3,12 +3,16 @@ import { PageHeader, Card } from "@/components/dashboard/ui";
 import DeleteForm from "@/components/dashboard/DeleteForm";
 import ProjectForm from "../ProjectForm";
 import { deleteProjectAction, updateProjectAction } from "../actions";
-import { getProject } from "@/lib/dashboard/store";
+import { getProject, listProjects } from "@/lib/dashboard/store";
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const project = getProject(Number(id));
+  const project = await getProject(Number(id));
   if (!project) notFound();
+
+  const existingCategories = Array.from(
+    new Set((await listProjects()).map((p) => p.category).filter(Boolean) as string[])
+  ).sort();
 
   return (
     <div>
@@ -24,7 +28,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
         }
       />
       <Card>
-        <ProjectForm mode="edit" project={project} action={updateProjectAction} />
+        <ProjectForm mode="edit" project={project} action={updateProjectAction} existingCategories={existingCategories} />
       </Card>
     </div>
   );

@@ -4,8 +4,8 @@ import DeleteForm from "@/components/dashboard/DeleteForm";
 import { listProjects } from "@/lib/dashboard/store";
 import { deleteProjectAction } from "./actions";
 
-export default function DashboardProjectsListPage() {
-  const projects = listProjects();
+export default async function DashboardProjectsListPage() {
+  const projects = await listProjects();
 
   return (
     <div>

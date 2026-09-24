@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
 import ViewBadge from "@/components/blog/ViewBadge";
-import { blogCategories, blogPosts, type BlogFilter } from "@/data/blog";
+import { type BlogFilter, type BlogPost } from "@/data/blog";
 import { RISE, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { sections } from "@/data/copy";
 
@@ -28,19 +28,51 @@ function AuthorAvatar({ name, size = 40 }: { name: string; size?: number }) {
   );
 }
 
-export default function BlogExplorer() {
+export default function BlogExplorer({ blogPosts }: { blogPosts: BlogPost[] }) {
   const [activeCategory, setActiveCategory] = useState<BlogFilter>("All Insights");
 
-  const featured = blogPosts.find((post) => post.featured);
-  const rest = blogPosts.filter((post) => !post.featured);
+  const sortedPosts = [...blogPosts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const featured = sortedPosts.find((post) => post.featured) || sortedPosts[0];
+  const rest = sortedPosts.filter((post) => post !== featured);
 
   const filteredPosts = rest.filter(
     (post) => activeCategory === "All Insights" || post.category === activeCategory,
   );
 
+  // Derive categories dynamically from actual post data
+  const usedCategories = Array.from(new Set(blogPosts.map(p => p.category))).sort();
+  const dynamicCategories = ["All Insights", ...usedCategories];
+
   return (
     <section className="pb-32 bg-void relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 relative z-10">
+        {/* Category filters */}
+        {blogPosts.length > 0 && dynamicCategories.length > 1 && (
+          <div className="flex justify-center pb-16 pt-8">
+            <motion.div
+              initial={{ opacity: 0, y: RISE.base }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-line bg-deep p-1.5 no-scrollbar"
+            >
+              {dynamicCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`whitespace-nowrap rounded-full px-6 py-2.5 text-[14px] font-semibold transition-all ${
+                    activeCategory === cat
+                      ? "bg-signal text-white shadow-lg shadow-(--signal-soft)"
+                      : "text-muted hover:bg-deep hover:text-primary"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </motion.div>
+          </div>
+        )}
+
         {/* Featured post */}
         {featured && (
           <motion.article
@@ -48,16 +80,13 @@ export default function BlogExplorer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={VIEWPORT}
             transition={enter()}
-            className="group relative grid overflow-hidden rounded-[32px] border border-line bg-surface shadow-xl lg:grid-cols-2"
+            className="group relative mb-16 grid overflow-hidden rounded-[32px] border border-line bg-surface shadow-xl lg:grid-cols-2"
           >
-            <div className="relative aspect-[16/10] lg:aspect-auto">
-              <Image
+            <div className="relative">
+              <img
                 src={featured.image}
                 alt={featured.title}
-                fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                priority
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="block w-full h-auto rounded-[32px] lg:rounded-l-[32px] lg:rounded-r-none transition-transform duration-700 ease-out group-hover:scale-105"
               />
             </div>
 
@@ -93,29 +122,6 @@ export default function BlogExplorer() {
           </motion.article>
         )}
 
-        {/* Category filters */}
-        <div className="flex justify-center py-16">
-          <motion.div
-            initial={{ opacity: 0, y: RISE.base }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={VIEWPORT}
-            className="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-line bg-deep p-1.5 no-scrollbar"
-          >
-            {blogCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`whitespace-nowrap rounded-full px-6 py-2.5 text-[14px] font-semibold transition-all ${
-                  activeCategory === cat
-                    ? "bg-signal text-white shadow-lg shadow-(--signal-soft)"
-                    : "text-muted hover:bg-deep hover:text-primary"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </motion.div>
-        </div>
 
         {/* Grid */}
         <motion.div layout className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
@@ -131,16 +137,14 @@ export default function BlogExplorer() {
                 transition={enterAt(i)}
                 className="group relative flex flex-col"
               >
-                <div className="relative mb-5 aspect-[4/3] w-full overflow-hidden rounded-[24px] border border-line">
+                <div className="relative mb-5 w-full overflow-hidden rounded-[24px] border border-line">
                   <span className="absolute left-4 top-4 z-10 rounded-full bg-signal px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-md">
                     {post.category}
                   </span>
-                  <Image
+                  <img
                     src={post.image}
                     alt={post.title}
-                    fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 </div>
 

@@ -3,12 +3,16 @@ import { PageHeader, Card } from "@/components/dashboard/ui";
 import DeleteForm from "@/components/dashboard/DeleteForm";
 import BlogForm from "../BlogForm";
 import { deleteBlogPostAction, updateBlogPostAction } from "../actions";
-import { getBlogPost } from "@/lib/dashboard/store";
+import { getBlogPost, listBlogPosts } from "@/lib/dashboard/store";
 
 export default async function EditBlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) notFound();
+
+  const existingCategories = Array.from(
+    new Set((await listBlogPosts()).map((p) => p.category).filter(Boolean))
+  ).sort();
 
   return (
     <div>
@@ -24,7 +28,7 @@ export default async function EditBlogPostPage({ params }: { params: Promise<{ s
         }
       />
       <Card>
-        <BlogForm mode="edit" post={post} action={updateBlogPostAction} />
+        <BlogForm mode="edit" post={post} action={updateBlogPostAction} existingCategories={existingCategories} />
       </Card>
     </div>
   );

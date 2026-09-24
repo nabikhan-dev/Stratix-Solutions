@@ -7,6 +7,7 @@ import FaqAccordion from "@/components/agency-landing/FaqAccordion";
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pricingFaqs } from "@/data/content";
 import { pageHeroes, sections } from "@/data/copy";
+import { listPricingTiers } from "@/lib/dashboard/store";
 
 export const metadata: Metadata = {
   title: { absolute: "Pricing | Fixed-Price MVP Builds — Stratix Solution" },
@@ -26,7 +27,9 @@ const faqSchema = {
   })),
 };
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const tiers = await listPricingTiers();
+
   return (
     <>
       <script
@@ -60,7 +63,7 @@ export default function PricingPage() {
           </div>
 
           <div className="mt-12">
-            <TierCards />
+            <TierCards tiers={tiers} />
           </div>
         </div>
       </section>

@@ -14,30 +14,9 @@ import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import { RISE, STAGGER, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { sections } from "@/data/copy";
 
-const services = [
-  {
-    icon: MobileProgramming01Icon,
-    title: "Mobile App Development",
-    desc: "iOS and Android apps built with Flutter or React Native. One codebase, native performance, and store submission handled for you. Built to scale from first users to first thousand.",
-  },
-  {
-    icon: WebDesign02Icon,
-    title: "Web App Development",
-    desc: "Fast, responsive web platforms and SaaS products. Built on modern stacks, measured on real business outcomes  signups, sales, and retention, not just page views.",
-  },
-  {
-    icon: AiNetworkIcon,
-    title: "AI Solutions",
-    desc: "Practical AI, not demos. Assistants, automated workflows, document processing, and intelligent features inside your existing product  with human review where it matters.",
-  },
-  {
-    icon: BrushIcon,
-    title: "UI/UX Design",
-    desc: "Interfaces people understand in seconds. Research, wireframes, and polished design systems that make your product feel premium and stay consistent as it grows.",
-  },
-];
+import { type PrimaryService } from "@/data/content";
 
-export default function ServicesSection() {
+export default function ServicesSection({ services }: { services: PrimaryService[] }) {
   return (
     <section id="services" className="relative py-16 sm:py-20 bg-void">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-8">
@@ -94,10 +73,16 @@ export default function ServicesSection() {
   );
 }
 
-type Service = (typeof services)[number];
+function ServiceCard({ service: s, index }: { service: PrimaryService; index: number }) {
+  // Map icons based on the ID, fallback to WebDesign
+  const icons: Record<string, any> = {
+    ai: AiNetworkIcon,
+    uiux: BrushIcon,
+    app: MobileProgramming01Icon,
+    web: WebDesign02Icon,
+  };
+  const icon = icons[s.id] || WebDesign02Icon;
 
-
-function ServiceCard({ service: s, index }: { service: Service; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: RISE.base }}
@@ -108,14 +93,14 @@ function ServiceCard({ service: s, index }: { service: Service; index: number })
     >
       {/* Icon tile  soft cyan square, dark glyph, exactly as in the catalogue cards */}
       <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-signal">
-        <HugeiconsIcon icon={s.icon} size={22} className="text-white" strokeWidth={1.75} />
+        <HugeiconsIcon icon={icon} size={22} className="text-white" strokeWidth={1.75} />
       </div>
 
       <h3 className="mt-6 text-[21px] font-bold leading-snug tracking-[-0.02em] text-primary">
         {s.title}
       </h3>
 
-      <p className="mt-4 text-[15px] leading-[1.65] text-muted">{s.desc}</p>
+      <p className="mt-4 text-[15px] leading-[1.65] text-muted">{s.short || s.description}</p>
 
       {/* Bottom row  the card's action */}
       <div className="mt-auto pt-8">

@@ -2,8 +2,8 @@ import { PageHeader } from "@/components/dashboard/ui";
 import { getSettings } from "@/lib/dashboard/store";
 import SettingsForm from "./SettingsForm";
 
-export default function DashboardSettingsPage() {
-  const settings = getSettings();
+export default async function DashboardSettingsPage() {
+  const settings = await getSettings();
 
   return (
     <div>
