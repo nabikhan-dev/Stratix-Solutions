@@ -7,12 +7,13 @@ import { getViewCount, incrementViewCount, formatViewCount } from "@/lib/view-co
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const count = getViewCount(slug);
+  const count = await getViewCount(slug);
   return NextResponse.json({ count, label: formatViewCount(count) });
 }
 
 export async function POST(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const count = incrementViewCount(slug);
+  const count = await incrementViewCount(slug);
   return NextResponse.json({ count, label: formatViewCount(count) });
 }
+
