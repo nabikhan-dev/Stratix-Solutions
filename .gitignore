@@ -56,3 +56,4 @@ ui-debug.log
 src/scripts/seed.ts
 src/scripts/refactor.ts
 src/scripts/refactor2.js
+.env.local
