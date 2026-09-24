@@ -1,0 +1,189 @@
+mutation InsertAssignment($data: Assignment_Data!) @auth(level: USER) {
+  assignment_insert(data: $data)
+}
+
+mutation UpsertAssignment($data: Assignment_Data!) @auth(level: USER) {
+  assignment_upsert(data: $data)
+}
+
+mutation UpdateAssignment($id: UUID!, $data: Assignment_Data!) @auth(level: USER) {
+  assignment_update(id: $id, data: $data)
+}
+
+mutation DeleteAssignment($id: UUID!) @auth(level: USER) {
+  assignment_delete(id: $id)
+}
+
+query GetAssignment($id: UUID!) @auth(level: USER) {
+  assignment(id: $id) {
+    id
+    roleOnProject
+    weeklyHoursAllocated
+  }
+}
+
+query ListAssignments @auth(level: USER) {
+  assignments {
+    id
+    roleOnProject
+    weeklyHoursAllocated
+  }
+}
+
+mutation InsertKpi($data: Kpi_Data!) @auth(level: USER) {
+  kpi_insert(data: $data)
+}
+
+mutation UpsertKpi($data: Kpi_Data!) @auth(level: USER) {
+  kpi_upsert(data: $data)
+}
+
+mutation UpdateKpi($id: UUID!, $data: Kpi_Data!) @auth(level: USER) {
+  kpi_update(id: $id, data: $data)
+}
+
+mutation DeleteKpi($id: UUID!) @auth(level: USER) {
+  kpi_delete(id: $id)
+}
+
+query GetKpi($id: UUID!) @auth(level: USER) {
+  kpi(id: $id) {
+    name
+    currentValue
+    targetValue
+  }
+}
+
+query ListKpis @auth(level: USER) {
+  kpis {
+    name
+    currentValue
+    targetValue
+  }
+}
+
+mutation InsertObjective($data: Objective_Data!) @auth(level: USER) {
+  objective_insert(data: $data)
+}
+
+mutation UpsertObjective($data: Objective_Data!) @auth(level: USER) {
+  objective_upsert(data: $data)
+}
+
+mutation UpdateObjective($id: UUID!, $data: Objective_Data!) @auth(level: USER) {
+  objective_update(id: $id, data: $data)
+}
+
+mutation DeleteObjective($id: UUID!) @auth(level: USER) {
+  objective_delete(id: $id)
+}
+
+query GetObjective($id: UUID!) @auth(level: USER) {
+  objective(id: $id) {
+    title
+    status
+    targetDate
+  }
+}
+
+query ListObjectives @auth(level: USER) {
+  objectives {
+    title
+    status
+    targetDate
+  }
+}
+
+mutation InsertOrganization($data: Organization_Data!) @auth(level: PUBLIC, insecureReason: "Organizations are public information") {
+  organization_insert(data: $data)
+}
+
+mutation UpsertOrganization($data: Organization_Data!) @auth(level: PUBLIC, insecureReason: "Organizations are public information") {
+  organization_upsert(data: $data)
+}
+
+mutation UpdateOrganization($id: UUID!, $data: Organization_Data!) @auth(level: USER) {
+  organization_update(id: $id, data: $data)
+}
+
+mutation DeleteOrganization($id: UUID!) @auth(level: USER) {
+  organization_delete(id: $id)
+}
+
+query GetOrganization($id: UUID!) @auth(level: PUBLIC, insecureReason: "Organizations are public information") {
+  organization(id: $id) {
+    name
+    industry
+  }
+}
+
+query ListOrganizations @auth(level: PUBLIC, insecureReason: "Organizations are public information") {
+  organizations {
+    name
+    industry
+  }
+}
+
+mutation InsertProject($data: Project_Data!) @auth(level: USER) {
+  project_insert(data: $data)
+}
+
+mutation UpsertProject($data: Project_Data!) @auth(level: USER) {
+  project_upsert(data: $data)
+}
+
+mutation UpdateProject($id: UUID!, $data: Project_Data!) @auth(level: USER) {
+  project_update(id: $id, data: $data)
+}
+
+mutation DeleteProject($id: UUID!) @auth(level: USER) {
+  project_delete(id: $id)
+}
+
+query GetProject($id: UUID!) @auth(level: USER) {
+  project(id: $id) {
+    name
+    startDate
+    endDate
+  }
+}
+
+query ListProjects @auth(level: USER) {
+  projects {
+    name
+    startDate
+    endDate
+  }
+}
+
+mutation InsertTeamMember($data: TeamMember_Data!) @auth(level: USER) {
+  teamMember_insert(data: $data)
+}
+
+mutation UpsertTeamMember($data: TeamMember_Data!) @auth(level: USER) {
+  teamMember_upsert(data: $data)
+}
+
+mutation UpdateTeamMember($id: UUID!, $data: TeamMember_Data!) @auth(level: USER) {
+  teamMember_update(id: $id, data: $data)
+}
+
+mutation DeleteTeamMember($id: UUID!) @auth(level: USER) {
+  teamMember_delete(id: $id)
+}
+
+query GetTeamMember($id: UUID!) @auth(level: USER) {
+  teamMember(id: $id) {
+    name
+    email
+    role
+  }
+}
+
+query ListTeamMembers @auth(level: USER) {
+  teamMembers {
+    name
+    email
+    role
+  }
+}

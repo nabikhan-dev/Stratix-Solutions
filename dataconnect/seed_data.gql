@@ -1,0 +1,92 @@
+mutation SeedData @transaction {
+  organization_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Tech Solutions Inc",
+      industry: "Software"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      name: "Green Energy Corp",
+      industry: "Energy"
+    }
+  ])
+  objective_insertMany(data: [
+    {
+      id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",
+      title: "Launch New Product",
+      targetDate: "2024-12-31",
+      status: "In Progress",
+      organization: { id: "550e8400-e29b-41d4-a716-446655440001" }
+    },
+    {
+      id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02",
+      title: "Reduce Carbon Footprint",
+      targetDate: "2025-06-30",
+      status: "Not Started",
+      organization: { id: "550e8400-e29b-41d4-a716-446655440002" }
+    }
+  ])
+  project_insertMany(data: [
+    {
+      id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b01",
+      name: "Mobile App Refresh",
+      startDate: "2024-01-01",
+      endDate: "2024-06-01",
+      budget: 50000.0,
+      priorityLevel: 1,
+      objective: { id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01" }
+    },
+    {
+      id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b02",
+      name: "Solar Panel Array",
+      startDate: "2024-02-01",
+      endDate: "2024-12-01",
+      budget: 150000.0,
+      priorityLevel: 2,
+      objective: { id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02" }
+    }
+  ])
+  kpi_insertMany(data: [
+    {
+      name: "Conversion Rate",
+      currentValue: 2.5,
+      unit: "percent",
+      objective: { id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01" }
+    },
+    {
+      name: "Emission Reduction",
+      currentValue: 100.0,
+      unit: "tons",
+      objective: { id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02" }
+    }
+  ])
+  teamMember_insertMany(data: [
+    {
+      id: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c01",
+      name: "Alice Smith",
+      email: "alice@example.com",
+      role: "Lead Developer"
+    },
+    {
+      id: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
+      name: "Bob Jones",
+      email: "bob@example.com",
+      role: "Project Manager"
+    }
+  ])
+  assignment_insertMany(data: [
+    {
+      roleOnProject: "Senior Architect",
+      weeklyHoursAllocated: 40.0,
+      project: { id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b01" },
+      teamMember: { id: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c01" }
+    },
+    {
+      roleOnProject: "Lead Coordinator",
+      weeklyHoursAllocated: 20.0,
+      project: { id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380b02" },
+      teamMember: { id: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c02" }
+    }
+  ])
+}

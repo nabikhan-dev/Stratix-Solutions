@@ -99,55 +99,41 @@ export default function ProjectsPortfolio({ projects }: { projects: Project[] })
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={enterAt(i)}
                   key={project.id}
-                  className="group flex flex-col cursor-pointer"
+                  className="group relative flex flex-col cursor-pointer"
                 >
-                  {/* Image Container (The Interactive Area) */}
+                  {/* Full-card invisible link overlay */}
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="absolute inset-0 z-30"
+                    aria-label={`View ${project.title} case study`}
+                  />
+
+                  {/* Image Container */}
                   <div
                     className={`relative w-full rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}
                   >
-                    {/* The Image (Hides on Hover) */}
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="block w-full h-auto transition-all duration-500 ease-out group-hover:scale-110 group-hover:opacity-100"
+                      className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />
-
-                    {/* Hover Detail Overlay (Shows on Hover) */}
-                    <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-start pt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-dark/70 backdrop-blur-sm overflow-y-auto">
-                      <p className="text-[15px] md:text-[16px] leading-relaxed text-white/90 mb-6 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-100">
-                        {project.description}
-                      </p>
-
-                      <div className="flex flex-wrap gap-2 mb-6 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-150">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-white/10 text-white border border-white/20"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-200">
-                        <Link
-                          href={`/projects/${project.id}`}
-                          className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-white/50 text-white transition-colors hover:bg-[var(--signal)] hover:text-white shadow-xl"
-                          aria-label="View Full Case Study"
-                        >
-                          <ArrowUpRight className="w-6 h-6" />
-                        </Link>
-                      </div>
-                    </div>
+                    {/* Subtle dark tint on hover only */}
+                    <div className="absolute inset-0 bg-dark/0 group-hover:bg-dark/15 transition-colors duration-500 pointer-events-none" />
                   </div>
 
-                  <div className="flex flex-col px-2">
-                    <p className="text-[11px] font-medium tracking-[0.15em] uppercase text-muted mb-2">
-                      {project.category ?? ""}
-                    </p>
-                    <h3 className="text-2xl font-semibold text-primary tracking-[-0.03em]">
-                      {project.title}
-                    </h3>
+                  {/* Title + Category */}
+                  <div className="flex items-end justify-between gap-4 px-2">
+                    <div className="flex flex-col">
+                      <p className="text-[11px] font-medium tracking-[0.15em] uppercase text-muted mb-2">
+                        {project.category ?? ""}
+                      </p>
+                      <h3 className="text-2xl font-semibold text-primary tracking-[-0.03em] group-hover:text-signal transition-colors duration-300">
+                        {project.title}
+                      </h3>
+                    </div>
+                    <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full border border-line bg-surface text-muted group-hover:border-signal group-hover:text-signal group-hover:bg-signal/10 transition-all duration-300">
+                      <ArrowUpRight className="w-4 h-4" />
+                    </span>
                   </div>
                 </motion.div>
               );

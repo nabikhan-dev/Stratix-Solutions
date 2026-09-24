@@ -82,11 +82,11 @@ export default function BlogExplorer({ blogPosts }: { blogPosts: BlogPost[] }) {
             transition={enter()}
             className="group relative mb-16 grid overflow-hidden rounded-[32px] border border-line bg-surface shadow-xl lg:grid-cols-2"
           >
-            <div className="relative">
+            <div className="relative min-h-[320px] lg:min-h-0">
               <img
                 src={featured.image}
                 alt={featured.title}
-                className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
             </div>
 

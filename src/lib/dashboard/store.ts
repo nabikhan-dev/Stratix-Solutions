@@ -16,6 +16,16 @@ export type SiteSettings = {
   responseTime: string;
   serving: string;
   contactNote: string;
+  // About page stats
+  stat1Label: string;
+  stat1Value: string;
+  stat1Desc: string;
+  stat2Label: string;
+  stat2Value: string;
+  stat2Desc: string;
+  stat3Label: string;
+  stat3Value: string;
+  stat3Desc: string;
 };
 
 function slugify(input: string): string {
@@ -277,7 +287,25 @@ export async function deleteFeatureOption(
 export async function getSettings(): Promise<SiteSettings> {
   const db = getAdminDb();
   const snapshot = await db.collection("settings").doc("main").get();
-  return snapshot.data() as SiteSettings;
+  const data = (snapshot.data() ?? {}) as Partial<SiteSettings>;
+  return {
+    siteTitle: data.siteTitle ?? "",
+    siteDescription: data.siteDescription ?? "",
+    ogImage: data.ogImage ?? "",
+    contactEmail: data.contactEmail ?? "",
+    responseTime: data.responseTime ?? "",
+    serving: data.serving ?? "",
+    contactNote: data.contactNote ?? "",
+    stat1Label: data.stat1Label ?? "Founded",
+    stat1Value: data.stat1Value ?? "2026",
+    stat1Desc: data.stat1Desc ?? "A modern product engineering company built for how software is made now.",
+    stat2Label: data.stat2Label ?? "Products shipped",
+    stat2Value: data.stat2Value ?? "10+",
+    stat2Desc: data.stat2Desc ?? "High-performance applications delivered to production globally.",
+    stat3Label: data.stat3Label ?? "Engineers and designers",
+    stat3Value: data.stat3Value ?? "8+",
+    stat3Desc: data.stat3Desc ?? "A lean senior team — no juniors learning on your budget.",
+  };
 }
 
 export async function updateSettings(

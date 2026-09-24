@@ -1,0 +1,46 @@
+type Organization @table {
+  name: String!
+  industry: String!
+  websiteUrl: String
+}
+
+type Objective @table {
+  title: String!
+  targetDate: Date!
+  status: String!
+  description: String
+  targetMetricValue: Float
+  organization: Organization!
+}
+
+type Project @table {
+  name: String!
+  startDate: Date!
+  endDate: Date!
+  budget: Float
+  priorityLevel: Int
+  objective: Objective!
+}
+
+type Kpi @table {
+  name: String!
+  currentValue: Float!
+  unit: String!
+  targetValue: Float
+  lastUpdated: Timestamp
+  objective: Objective!
+}
+
+type TeamMember @table {
+  name: String!
+  email: String!
+  role: String!
+  department: String
+}
+
+type Assignment @table {
+  roleOnProject: String!
+  weeklyHoursAllocated: Float
+  project: Project!
+  teamMember: TeamMember!
+}

@@ -61,8 +61,15 @@ export default function WorkPortfolio({ projects }: { projects: Project[] }) {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={enterAt(i)}
                   key={project.id}
-                  className="group flex flex-col cursor-pointer"
+                  className="group relative flex flex-col cursor-pointer"
                 >
+                  {/* Full-card invisible link overlay */}
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="absolute inset-0 z-20"
+                    aria-label={`View ${project.title} case study`}
+                  />
+
                   {/* Image Container */}
                   <div className={`relative w-full rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}>
                     {project.category && (
@@ -79,20 +86,12 @@ export default function WorkPortfolio({ projects }: { projects: Project[] }) {
                       className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />
                     <div className="absolute inset-0 bg-dark/0 transition-colors duration-500 group-hover:bg-dark/10" />
-
-                    {/* Make the whole image area clickable to the case study */}
-                    <Link
-                      href={`/projects/${project.id}`}
-                      data-cursor="View"
-                      className="absolute inset-0 z-20"
-                      aria-label={`View ${project.title}`}
-                    />
                   </div>
 
                   {/* Decoupled Typography & Metrics */}
                   <div className="flex items-start justify-between gap-4 px-2">
                     <div className="flex-1">
-                      <h3 className="text-2xl md:text-[28px] font-semibold text-primary tracking-[-0.04em] mb-3">
+                      <h3 className="text-2xl md:text-[28px] font-semibold text-primary tracking-[-0.04em] mb-3 group-hover:text-signal transition-colors duration-300">
                         {project.title}
                       </h3>
                       <p className="text-[14px] text-muted leading-relaxed line-clamp-3">

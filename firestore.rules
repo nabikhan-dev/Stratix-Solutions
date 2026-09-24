@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── User documents ─────────────────────────────────────────────────────────
+    // Users can read and write their own profile document.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // ── All sub-collections (skills, notifications, etc.) ───────────────────
+      // A single wildcard rule covers every sub-collection under users/{userId}
+      // so we don't need a separate rule each time we add a new one.
+      match /{subcollection}/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

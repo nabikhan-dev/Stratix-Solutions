@@ -25,11 +25,19 @@ export async function updateSettingsAction(_prevState: SettingsFormState, formDa
     responseTime: String(formData.get("responseTime") ?? "").trim(),
     serving: String(formData.get("serving") ?? "").trim(),
     contactNote: String(formData.get("contactNote") ?? "").trim(),
+    // About page stats
+    stat1Label: String(formData.get("stat1Label") ?? "").trim(),
+    stat1Value: String(formData.get("stat1Value") ?? "").trim(),
+    stat1Desc:  String(formData.get("stat1Desc")  ?? "").trim(),
+    stat2Label: String(formData.get("stat2Label") ?? "").trim(),
+    stat2Value: String(formData.get("stat2Value") ?? "").trim(),
+    stat2Desc:  String(formData.get("stat2Desc")  ?? "").trim(),
+    stat3Label: String(formData.get("stat3Label") ?? "").trim(),
+    stat3Value: String(formData.get("stat3Value") ?? "").trim(),
+    stat3Desc:  String(formData.get("stat3Desc")  ?? "").trim(),
   });
 
-  // Same caveat as services/pricing: this updates the dashboard's own copy
-  // only. layout.tsx's <Metadata> and content.ts's `contact` still drive
-  // the live site until they're wired to read from this store.
   revalidatePath("/dashboard/settings");
+  revalidatePath("/about");
   return { savedAt: Date.now() };
 }

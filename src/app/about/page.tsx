@@ -8,6 +8,7 @@ import CountUp from "@/components/motion/CountUp";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
 import { aboutPage, pageHeroes } from "@/data/copy";
+import { getSettings } from "@/lib/dashboard/store";
 
 export const metadata: Metadata = {
   // `absolute` keeps the root layout's "— Stratix Solutions" suffix off this
@@ -24,7 +25,15 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSettings();
+
+  const stats = [
+    { label: settings.stat1Label, value: settings.stat1Value, desc: settings.stat1Desc },
+    { label: settings.stat2Label, value: settings.stat2Value, desc: settings.stat2Desc },
+    { label: settings.stat3Label, value: settings.stat3Value, desc: settings.stat3Desc },
+  ];
+
   return (
     <div className="text-primary min-h-screen pb-0 font-sans selection:bg-[var(--signal-soft)] overflow-hidden">
       <PageHero
@@ -37,7 +46,7 @@ export default function AboutPage() {
       <section className="py-16 sm:py-20">
         <div className="container-px w-full max-w-[1600px] mx-auto">
           <div className="grid grid-cols-1 divide-y divide-line border-y border-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {aboutPage.stats.map((s, i) => (
+            {stats.map((s, i) => (
               <Reveal
                 key={s.label}
                 delay={i * STAGGER}
