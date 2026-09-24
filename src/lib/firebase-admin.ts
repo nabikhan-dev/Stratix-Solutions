@@ -42,7 +42,3 @@ export function getAdminDb(): Firestore {
   }
   return _db;
 }
-
-export function getAdminStorage() {
-  return getStorage(getAdminApp()).bucket("stratix-solutions.firebasestorage.app");
-}
