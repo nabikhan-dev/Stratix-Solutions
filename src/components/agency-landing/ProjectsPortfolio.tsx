@@ -113,12 +113,12 @@ export default function ProjectsPortfolio({ projects }: { projects: Project[] })
                     />
 
                     {/* Hover Detail Overlay (Shows on Hover) */}
-                    <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-dark/60 backdrop-blur-sm">
-                      <p className="text-[16px] md:text-[18px] leading-relaxed text-white/90 mb-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-100">
+                    <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-start pt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-dark/70 backdrop-blur-sm overflow-y-auto">
+                      <p className="text-[15px] md:text-[16px] leading-relaxed text-white/90 mb-6 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-100">
                         {project.description}
                       </p>
 
-                      <div className="flex flex-wrap gap-2 mb-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-150">
+                      <div className="flex flex-wrap gap-2 mb-6 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-150">
                         {project.tags.map((tag) => (
                           <span
                             key={tag}
@@ -129,7 +129,7 @@ export default function ProjectsPortfolio({ projects }: { projects: Project[] })
                         ))}
                       </div>
 
-                      <div className="mt-auto transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-200">
+                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-out delay-200">
                         <Link
                           href={`/projects/${project.id}`}
                           className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-white/50 text-white transition-colors hover:bg-[var(--signal)] hover:text-white shadow-xl"
