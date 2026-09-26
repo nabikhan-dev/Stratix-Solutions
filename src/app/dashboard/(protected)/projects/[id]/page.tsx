@@ -5,6 +5,11 @@ import ProjectForm from "../ProjectForm";
 import { deleteProjectAction, updateProjectAction } from "../actions";
 import { getProject, listProjects } from "@/lib/dashboard/store";
 
+export async function generateStaticParams() {
+  const projects = await listProjects();
+  return projects.map((p) => ({ id: String(p.id) }));
+}
+
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const project = await getProject(Number(id));

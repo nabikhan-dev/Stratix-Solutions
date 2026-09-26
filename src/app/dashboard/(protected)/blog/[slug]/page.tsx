@@ -5,6 +5,11 @@ import BlogForm from "../BlogForm";
 import { deleteBlogPostAction, updateBlogPostAction } from "../actions";
 import { getBlogPost, listBlogPosts } from "@/lib/dashboard/store";
 
+export async function generateStaticParams() {
+  const blogPosts = await listBlogPosts();
+  return blogPosts.map((post) => ({ slug: post.slug }));
+}
+
 export default async function EditBlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await getBlogPost(slug);
