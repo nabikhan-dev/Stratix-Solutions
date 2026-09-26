@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 import ViewBadge from "@/components/blog/ViewBadge";
-import { listBlogPosts, getBlogPost } from "@/lib/dashboard/store";
+import { listBlogPosts, getBlogPost } from "@/lib/public-store";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
 import ClosingCta from "@/components/layout/ClosingCta";

@@ -7,7 +7,7 @@ import FaqAccordion from "@/components/agency-landing/FaqAccordion";
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pricingFaqs } from "@/data/content";
 import { pageHeroes, sections } from "@/data/copy";
-import { listPricingTiers } from "@/lib/dashboard/store";
+import { listPricingTiers } from "@/lib/public-store";
 
 export const metadata: Metadata = {
   title: { absolute: "Pricing | Fixed-Price MVP Builds — Stratix Solution" },

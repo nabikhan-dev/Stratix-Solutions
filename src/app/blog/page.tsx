@@ -3,7 +3,7 @@ import PageHero from "@/components/layout/PageHero";
 import BlogExplorer from "@/components/blog/BlogExplorer";
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pageHeroes } from "@/data/copy";
-import { listBlogPosts } from "@/lib/dashboard/store";
+import { listBlogPosts } from "@/lib/public-store";
 
 export const metadata: Metadata = {
   title: "Blog",

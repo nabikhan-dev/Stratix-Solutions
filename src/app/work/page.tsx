@@ -6,7 +6,7 @@ import FullVisibilityTimeline from "@/components/work/FullVisibilityTimeline";
 import WeekByWeek from "@/components/work/WeekByWeek";
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pageHeroes } from "@/data/copy";
-import { listProjects } from "@/lib/dashboard/store";
+import { listProjects } from "@/lib/public-store";
 
 export const metadata: Metadata = {
   title: "Our Work | Shipped Products & Results  Stratix Solution",

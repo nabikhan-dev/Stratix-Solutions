@@ -8,7 +8,7 @@ import CountUp from "@/components/motion/CountUp";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
 import { aboutPage, pageHeroes } from "@/data/copy";
-import { getSettings } from "@/lib/dashboard/store";
+import { getSettings } from "@/lib/public-store";
 
 export const metadata: Metadata = {
   // `absolute` keeps the root layout's "— Stratix Solutions" suffix off this

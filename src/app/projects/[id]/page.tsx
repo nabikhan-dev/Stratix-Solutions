@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CircleCheckBig, ArrowUpRight } from "lucide-react";
-import { listProjects, getProject } from "@/lib/dashboard/store";
+import { listProjects, getProject } from "@/lib/public-store";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
 

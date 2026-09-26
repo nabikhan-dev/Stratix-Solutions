@@ -6,7 +6,7 @@ import TechStackSection from "@/components/agency-landing/TechStackSection";
 import ServicesSection from "@/components/agency-landing/ServicesSection";
 import ProjectsPortfolio from "@/components/agency-landing/ProjectsPortfolio";
 import ProcessOverview from "@/components/agency-landing/ProcessOverview";
-import { listProjects, listServices } from "@/lib/dashboard/store";
+import { listProjects, listServices } from "@/lib/public-store";
 
 import TestimonialsSection from "@/components/agency-landing/TestimonialsSection";
 

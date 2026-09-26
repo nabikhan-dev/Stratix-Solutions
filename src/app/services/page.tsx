@@ -7,7 +7,7 @@ import ClosingCta from "@/components/layout/ClosingCta";
 
 import CinematicHeading from "@/components/layout/CinematicHeading";
 import { pageHeroes, sections } from "@/data/copy";
-import { listServices } from "@/lib/dashboard/store";
+import { listServices } from "@/lib/public-store";
 
 export const metadata: Metadata = {
   title: "Services | AI, App, Web & UI/UX  Stratix Solution",
