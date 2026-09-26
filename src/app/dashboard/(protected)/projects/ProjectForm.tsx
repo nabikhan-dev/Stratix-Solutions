@@ -37,7 +37,7 @@ export default function ProjectForm({
         if (result.error) {
           setError(result.error);
         } else {
-          router.push(`/dashboard/projects/${result.id}`);
+          router.push(`/dashboard/projects/edit/?id=${result.id}`);
         }
       } else {
         const result = await updateProjectAction(formData);

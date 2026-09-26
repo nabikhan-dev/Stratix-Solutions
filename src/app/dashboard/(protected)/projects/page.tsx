@@ -76,7 +76,10 @@ export default function DashboardProjectsListPage() {
                 </Td>
                 <Td className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/dashboard/projects/${project.id}`} className={buttonGhostClass}>
+                    <Link
+                      href={{ pathname: "/dashboard/projects/edit/", query: { id: project.id } }}
+                      className={buttonGhostClass}
+                    >
                       Edit
                     </Link>
                     <DeleteButton

@@ -111,7 +111,10 @@ export default function DashboardBlogListPage() {
 
                 <Td className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/dashboard/blog/${post.slug}`} className={buttonGhostClass}>
+                    <Link
+                      href={{ pathname: "/dashboard/blog/edit/", query: { slug: post.slug } }}
+                      className={buttonGhostClass}
+                    >
                       Edit
                     </Link>
                     <DeleteButton

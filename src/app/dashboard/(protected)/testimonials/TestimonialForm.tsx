@@ -29,7 +29,7 @@ export default function TestimonialForm({
         if (result.error) {
           setError(result.error);
         } else {
-          router.push(`/dashboard/testimonials/${result.id}`);
+          router.push(`/dashboard/testimonials/edit/?id=${encodeURIComponent(result.id ?? "")}`);
         }
       } else {
         const result = await updateTestimonialAction(formData);

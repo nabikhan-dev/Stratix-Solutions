@@ -38,7 +38,7 @@ export default function BlogForm({
         if (result.error) {
           setError(result.error);
         } else {
-          router.push(`/dashboard/blog/${result.slug}`);
+          router.push(`/dashboard/blog/edit/?slug=${encodeURIComponent(result.slug ?? "")}`);
         }
       } else {
         const result = await updateBlogPostAction(formData);

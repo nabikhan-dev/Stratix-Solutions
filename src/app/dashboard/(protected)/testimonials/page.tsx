@@ -74,7 +74,10 @@ export default function DashboardTestimonialsListPage() {
                 <Td className="text-muted max-w-xs truncate"><span title={testimonial.quote}>{testimonial.quote}</span></Td>
                 <Td className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/dashboard/testimonials/${testimonial.id}`} className={buttonGhostClass}>
+                    <Link
+                      href={{ pathname: "/dashboard/testimonials/edit/", query: { id: testimonial.id } }}
+                      className={buttonGhostClass}
+                    >
                       Edit
                     </Link>
                     <DeleteButton
