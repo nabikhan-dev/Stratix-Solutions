@@ -4,7 +4,26 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import type { BlogPost } from "@/data/blog";
 import type { Project } from "@/data/projects";
 import type { PrimaryService, PricingTier } from "@/data/content";
-import type { SiteSettings } from "@/lib/dashboard/store";
+import type { PricingCategory } from "@/data/pricing";
+
+export type SiteSettings = {
+  siteTitle: string;
+  siteDescription: string;
+  ogImage: string;
+  contactEmail: string;
+  responseTime: string;
+  serving: string;
+  contactNote: string;
+  stat1Label: string;
+  stat1Value: string;
+  stat1Desc: string;
+  stat2Label: string;
+  stat2Value: string;
+  stat2Desc: string;
+  stat3Label: string;
+  stat3Value: string;
+  stat3Desc: string;
+};
 
 export async function listBlogPosts(): Promise<BlogPost[]> {
   const snapshot = await getDocs(collection(db, "blogPosts"));

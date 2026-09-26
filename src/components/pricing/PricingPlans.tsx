@@ -3,7 +3,7 @@ import SectionHeading from "@/components/layout/SectionHeading";
 import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import TierCards from "@/components/pricing/TierCards";
 import { sections } from "@/data/copy";
-import { listPricingTiers } from "@/lib/dashboard/store";
+import { listPricingTiers } from "@/lib/public-store";
 
 export default async function PricingPlans() {
   const tiers = await listPricingTiers();
