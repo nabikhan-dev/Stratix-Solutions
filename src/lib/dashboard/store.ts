@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getAdminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot } from "firebase-admin/firestore";
 
 import type { BlogPost } from "@/data/blog";
 import type { Project } from "@/data/projects";
@@ -41,7 +42,7 @@ function slugify(input: string): string {
 export async function listBlogPosts(): Promise<BlogPost[]> {
   const db = getAdminDb();
   const snapshot = await db.collection("blogPosts").get();
-  return snapshot.docs.map((d) => d.data() as BlogPost);
+  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as BlogPost);
 }
 
 export async function getBlogPost(slug: string): Promise<BlogPost | undefined> {
@@ -87,7 +88,7 @@ export async function deleteBlogPost(slug: string): Promise<void> {
 export async function listProjects(): Promise<Project[]> {
   const db = getAdminDb();
   const snapshot = await db.collection("projects").get();
-  return snapshot.docs.map((d) => d.data() as Project);
+  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as Project);
 }
 
 export async function getProject(id: number): Promise<Project | undefined> {
@@ -129,7 +130,7 @@ export async function deleteProject(id: number): Promise<void> {
 export async function listTestimonials(): Promise<Testimonial[]> {
   const db = getAdminDb();
   const snapshot = await db.collection("testimonials").get();
-  return snapshot.docs.map((d) => d.data() as Testimonial);
+  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as Testimonial);
 }
 
 export async function getTestimonial(
@@ -172,7 +173,7 @@ export async function deleteTestimonial(id: string): Promise<void> {
 export async function listServices(): Promise<PrimaryService[]> {
   const db = getAdminDb();
   const snapshot = await db.collection("services").get();
-  return snapshot.docs.map((d) => d.data() as PrimaryService);
+  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as PrimaryService);
 }
 
 export async function getService(
@@ -200,7 +201,7 @@ export async function updateService(
 export async function listPricingTiers(): Promise<PricingTier[]> {
   const db = getAdminDb();
   const snapshot = await db.collection("pricingTiers").get();
-  return snapshot.docs.map((d) => d.data() as PricingTier);
+  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as PricingTier);
 }
 
 export async function updatePricingTier(
@@ -221,7 +222,7 @@ export async function updatePricingTier(
 export async function listFeatureCategories(): Promise<PricingCategory[]> {
   const db = getAdminDb();
   const snapshot = await db.collection("featureCategories").get();
-  return snapshot.docs.map((d) => d.data() as PricingCategory);
+  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as PricingCategory);
 }
 
 export async function getFeatureCategory(
