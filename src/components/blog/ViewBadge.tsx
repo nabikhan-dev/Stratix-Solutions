@@ -6,16 +6,20 @@ import {
   BLOG_VIEW_COUNTING_DISABLED,
   BLOG_VIEW_COUNTING_PREFERENCE_KEY,
 } from "@/lib/privacy-preferences";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc, increment } from "firebase/firestore";
+
+function formatViewCount(n: number): string {
+  if (n >= 1000) {
+    const k = n / 1000;
+    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}k views`;
+  }
+  return `${n} view${n === 1 ? "" : "s"}`;
+}
 
 /**
- * Live view count for a blog post. GET-only when just displaying a count
- * (e.g. the /blog listing cards); pass `record` on the post's own detail
- * page to bump the counter once per visit.
- *
- * "Once per visit" is enforced client-side via sessionStorage — without it,
- * every re-render/refresh in the same tab would inflate the count, and
- * React 18 Strict Mode's dev-only double-invoke of effects would double it
- * on the very first load.
+ * Live view count for a blog post.
+ * Uses client-side Firebase to fetch and increment view counts.
  */
 export default function ViewBadge({
   slug,
@@ -34,18 +38,32 @@ export default function ViewBadge({
     const countingDisabled =
       localStorage.getItem(BLOG_VIEW_COUNTING_PREFERENCE_KEY) === BLOG_VIEW_COUNTING_DISABLED;
     const alreadyRecorded = record && !countingDisabled && sessionStorage.getItem(sessionKey);
-    const method = record && !countingDisabled && !alreadyRecorded ? "POST" : "GET";
+    const shouldRecord = record && !countingDisabled && !alreadyRecorded;
 
-    fetch(`/api/views/${slug}`, { method })
-      .then((res) => res.json())
-      .then((data: { label: string }) => {
-        if (cancelled) return;
-        setLabel(data.label);
-        if (method === "POST") sessionStorage.setItem(sessionKey, "1");
-      })
-      .catch(() => {
+    async function fetchViewCount() {
+      try {
+        const ref = doc(db, "viewCounts", slug);
+        let count = 0;
+
+        if (shouldRecord) {
+          await setDoc(ref, { count: increment(1) }, { merge: true });
+          sessionStorage.setItem(sessionKey, "1");
+          const updated = await getDoc(ref);
+          count = updated.exists() ? (updated.data().count as number) : 1;
+        } else {
+          const docSnap = await getDoc(ref);
+          count = docSnap.exists() ? (docSnap.data().count as number) : 0;
+        }
+
+        if (!cancelled) {
+          setLabel(formatViewCount(count));
+        }
+      } catch (err) {
         if (!cancelled) setLabel(null);
-      });
+      }
+    }
+
+    fetchViewCount();
 
     return () => {
       cancelled = true;
