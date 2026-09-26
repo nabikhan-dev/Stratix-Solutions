@@ -1,33 +1,23 @@
 import "server-only";
 
-import { getAdminDb } from "@/lib/firebase-admin";
-import { QueryDocumentSnapshot } from "firebase-admin/firestore";
+import { db } from "@/lib/firebase";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 import type { BlogPost } from "@/data/blog";
 import type { Project } from "@/data/projects";
 import type { Testimonial } from "@/data/testimonials";
 import type { PrimaryService, PricingTier } from "@/data/content";
 import type { PricingCategory } from "@/data/pricing";
-
-export type SiteSettings = {
-  siteTitle: string;
-  siteDescription: string;
-  ogImage: string;
-  contactEmail: string;
-  responseTime: string;
-  serving: string;
-  contactNote: string;
-  // About page stats
-  stat1Label: string;
-  stat1Value: string;
-  stat1Desc: string;
-  stat2Label: string;
-  stat2Value: string;
-  stat2Desc: string;
-  stat3Label: string;
-  stat3Value: string;
-  stat3Desc: string;
-};
+import type { SiteSettings } from "@/lib/public-store";
+export type { SiteSettings };
 
 function slugify(input: string): string {
   return input
@@ -40,29 +30,26 @@ function slugify(input: string): string {
 // ── Blog ────────────────────────────────────────────────────────────────
 
 export async function listBlogPosts(): Promise<BlogPost[]> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("blogPosts").get();
-  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as BlogPost);
+  const snapshot = await getDocs(collection(db, "blogPosts"));
+  return snapshot.docs.map((d) => d.data() as BlogPost);
 }
 
 export async function getBlogPost(slug: string): Promise<BlogPost | undefined> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("blogPosts").doc(slug).get();
-  return snapshot.exists ? (snapshot.data() as BlogPost) : undefined;
+  const snapshot = await getDoc(doc(db, "blogPosts", slug));
+  return snapshot.exists() ? (snapshot.data() as BlogPost) : undefined;
 }
 
 export async function createBlogPost(
   input: Omit<BlogPost, "slug"> & { slug?: string }
 ): Promise<BlogPost> {
-  const db = getAdminDb();
   const slug = input.slug?.trim() || slugify(input.title);
-  const ref = db.collection("blogPosts").doc(slug);
-  const snapshot = await ref.get();
-  if (snapshot.exists) {
+  const ref = doc(db, "blogPosts", slug);
+  const snapshot = await getDoc(ref);
+  if (snapshot.exists()) {
     throw new Error(`A post with slug "${slug}" already exists.`);
   }
   const post = { ...input, slug } as BlogPost;
-  await ref.set(post);
+  await setDoc(ref, post);
   return post;
 }
 
@@ -70,41 +57,36 @@ export async function updateBlogPost(
   slug: string,
   input: Partial<Omit<BlogPost, "slug">>
 ): Promise<BlogPost> {
-  const db = getAdminDb();
-  const ref = db.collection("blogPosts").doc(slug);
-  const snapshot = await ref.get();
-  if (!snapshot.exists) throw new Error(`No post found with slug "${slug}".`);
-  await ref.update(input);
+  const ref = doc(db, "blogPosts", slug);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) throw new Error(`No post found with slug "${slug}".`);
+  await updateDoc(ref, input);
   return { ...snapshot.data(), ...input } as BlogPost;
 }
 
 export async function deleteBlogPost(slug: string): Promise<void> {
-  const db = getAdminDb();
-  await db.collection("blogPosts").doc(slug).delete();
+  await deleteDoc(doc(db, "blogPosts", slug));
 }
 
 // ── Projects ────────────────────────────────────────────────────────────
 
 export async function listProjects(): Promise<Project[]> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("projects").get();
-  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as Project);
+  const snapshot = await getDocs(collection(db, "projects"));
+  return snapshot.docs.map((d) => d.data() as Project);
 }
 
 export async function getProject(id: number): Promise<Project | undefined> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("projects").doc(id.toString()).get();
-  return snapshot.exists ? (snapshot.data() as Project) : undefined;
+  const snapshot = await getDoc(doc(db, "projects", id.toString()));
+  return snapshot.exists() ? (snapshot.data() as Project) : undefined;
 }
 
 export async function createProject(
   input: Omit<Project, "id">
 ): Promise<Project> {
-  const db = getAdminDb();
   const projects = await listProjects();
   const nextId = projects.reduce((max, p) => Math.max(max, p.id), 0) + 1;
   const project = { ...input, id: nextId } as Project;
-  await db.collection("projects").doc(nextId.toString()).set(project);
+  await setDoc(doc(db, "projects", nextId.toString()), project);
   return project;
 }
 
@@ -112,42 +94,37 @@ export async function updateProject(
   id: number,
   input: Partial<Omit<Project, "id">>
 ): Promise<Project> {
-  const db = getAdminDb();
-  const ref = db.collection("projects").doc(id.toString());
-  const snapshot = await ref.get();
-  if (!snapshot.exists) throw new Error(`No project found with id ${id}.`);
-  await ref.update(input);
+  const ref = doc(db, "projects", id.toString());
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) throw new Error(`No project found with id ${id}.`);
+  await updateDoc(ref, input);
   return { ...snapshot.data(), ...input } as Project;
 }
 
 export async function deleteProject(id: number): Promise<void> {
-  const db = getAdminDb();
-  await db.collection("projects").doc(id.toString()).delete();
+  await deleteDoc(doc(db, "projects", id.toString()));
 }
 
 // ── Testimonials ────────────────────────────────────────────────────────
 
 export async function listTestimonials(): Promise<Testimonial[]> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("testimonials").get();
-  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as Testimonial);
+  const snapshot = await getDocs(collection(db, "testimonials"));
+  return snapshot.docs.map((d) => d.data() as Testimonial);
 }
 
 export async function getTestimonial(
   id: string
 ): Promise<Testimonial | undefined> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("testimonials").doc(id).get();
-  return snapshot.exists ? (snapshot.data() as Testimonial) : undefined;
+  const snapshot = await getDoc(doc(db, "testimonials", id));
+  return snapshot.exists() ? (snapshot.data() as Testimonial) : undefined;
 }
 
 export async function createTestimonial(
   input: Omit<Testimonial, "id">
 ): Promise<Testimonial> {
-  const db = getAdminDb();
   const id = Date.now().toString();
   const testimonial = { ...input, id } as Testimonial;
-  await db.collection("testimonials").doc(id).set(testimonial);
+  await setDoc(doc(db, "testimonials", id), testimonial);
   return testimonial;
 }
 
@@ -155,85 +132,73 @@ export async function updateTestimonial(
   id: string,
   input: Partial<Omit<Testimonial, "id">>
 ): Promise<Testimonial> {
-  const db = getAdminDb();
-  const ref = db.collection("testimonials").doc(id);
-  const snapshot = await ref.get();
-  if (!snapshot.exists) throw new Error(`No testimonial found with id ${id}.`);
-  await ref.update(input);
+  const ref = doc(db, "testimonials", id);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) throw new Error(`No testimonial found with id ${id}.`);
+  await updateDoc(ref, input);
   return { ...snapshot.data(), ...input } as Testimonial;
 }
 
 export async function deleteTestimonial(id: string): Promise<void> {
-  const db = getAdminDb();
-  await db.collection("testimonials").doc(id).delete();
+  await deleteDoc(doc(db, "testimonials", id));
 }
 
 // ── Services ────────────────────────────────────────────────────────────
 
 export async function listServices(): Promise<PrimaryService[]> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("services").get();
-  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as PrimaryService);
+  const snapshot = await getDocs(collection(db, "services"));
+  return snapshot.docs.map((d) => d.data() as PrimaryService);
 }
 
 export async function getService(
   id: string
 ): Promise<PrimaryService | undefined> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("services").doc(id).get();
-  return snapshot.exists ? (snapshot.data() as PrimaryService) : undefined;
+  const snapshot = await getDoc(doc(db, "services", id));
+  return snapshot.exists() ? (snapshot.data() as PrimaryService) : undefined;
 }
 
 export async function updateService(
   id: string,
   input: Partial<Omit<PrimaryService, "id">>
 ): Promise<PrimaryService> {
-  const db = getAdminDb();
-  const ref = db.collection("services").doc(id);
-  const snapshot = await ref.get();
-  if (!snapshot.exists) throw new Error(`No service found with id "${id}".`);
-  await ref.update(input);
+  const ref = doc(db, "services", id);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) throw new Error(`No service found with id "${id}".`);
+  await updateDoc(ref, input);
   return { ...snapshot.data(), ...input } as PrimaryService;
 }
 
 // ── Pricing tiers ───────────────────────────────────────────────────────
 
 export async function listPricingTiers(): Promise<PricingTier[]> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("pricingTiers").get();
-  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as PricingTier);
+  const snapshot = await getDocs(collection(db, "pricingTiers"));
+  return snapshot.docs.map((d) => d.data() as PricingTier);
 }
 
 export async function updatePricingTier(
   id: string,
   input: Partial<Omit<PricingTier, "id">>
 ): Promise<PricingTier> {
-  const db = getAdminDb();
-  const ref = db.collection("pricingTiers").doc(id);
-  const snapshot = await ref.get();
-  if (!snapshot.exists)
+  const ref = doc(db, "pricingTiers", id);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists())
     throw new Error(`No pricing tier found with id "${id}".`);
-  await ref.update(input);
+  await updateDoc(ref, input);
   return { ...snapshot.data(), ...input } as PricingTier;
 }
 
 // ── Feature categories/options ──────────────────────────────────────────
 
 export async function listFeatureCategories(): Promise<PricingCategory[]> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("featureCategories").get();
-  return snapshot.docs.map((d: QueryDocumentSnapshot) => d.data() as PricingCategory);
+  const snapshot = await getDocs(collection(db, "featureCategories"));
+  return snapshot.docs.map((d) => d.data() as PricingCategory);
 }
 
 export async function getFeatureCategory(
   categoryId: string
 ): Promise<PricingCategory | undefined> {
-  const db = getAdminDb();
-  const snapshot = await db
-    .collection("featureCategories")
-    .doc(categoryId)
-    .get();
-  return snapshot.exists ? (snapshot.data() as PricingCategory) : undefined;
+  const snapshot = await getDoc(doc(db, "featureCategories", categoryId));
+  return snapshot.exists() ? (snapshot.data() as PricingCategory) : undefined;
 }
 
 export async function updateFeatureOption(
@@ -241,15 +206,14 @@ export async function updateFeatureOption(
   optionId: string,
   input: { name?: string; price?: number }
 ): Promise<void> {
-  const db = getAdminDb();
-  const ref = db.collection("featureCategories").doc(categoryId);
-  const snapshot = await ref.get();
-  if (!snapshot.exists) return;
+  const ref = doc(db, "featureCategories", categoryId);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) return;
   const cat = snapshot.data() as PricingCategory;
   const newOptions = cat.options.map((opt) =>
     opt.id === optionId ? { ...opt, ...input } : opt
   );
-  await ref.update({ options: newOptions });
+  await updateDoc(ref, { options: newOptions });
 }
 
 export async function createFeatureOption(
@@ -257,28 +221,26 @@ export async function createFeatureOption(
   name: string,
   price: number
 ): Promise<void> {
-  const db = getAdminDb();
   const id = slugify(name) || `option-${Date.now()}`;
-  const ref = db.collection("featureCategories").doc(categoryId);
-  const snapshot = await ref.get();
-  if (!snapshot.exists) return;
+  const ref = doc(db, "featureCategories", categoryId);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) return;
   const cat = snapshot.data() as PricingCategory;
   if (cat.options.some((o) => o.id === id)) {
     throw new Error(`"${name}" already exists in ${cat.name}.`);
   }
-  await ref.update({ options: [...cat.options, { id, name, price }] });
+  await updateDoc(ref, { options: [...cat.options, { id, name, price }] });
 }
 
 export async function deleteFeatureOption(
   categoryId: string,
   optionId: string
 ): Promise<void> {
-  const db = getAdminDb();
-  const ref = db.collection("featureCategories").doc(categoryId);
-  const snapshot = await ref.get();
-  if (!snapshot.exists) return;
+  const ref = doc(db, "featureCategories", categoryId);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) return;
   const cat = snapshot.data() as PricingCategory;
-  await ref.update({
+  await updateDoc(ref, {
     options: cat.options.filter((o) => o.id !== optionId),
   });
 }
@@ -286,9 +248,8 @@ export async function deleteFeatureOption(
 // ── Site settings ───────────────────────────────────────────────────────
 
 export async function getSettings(): Promise<SiteSettings> {
-  const db = getAdminDb();
-  const snapshot = await db.collection("settings").doc("main").get();
-  const data = (snapshot.data() ?? {}) as Partial<SiteSettings>;
+  const snapshot = await getDoc(doc(db, "settings", "main"));
+  const data = (snapshot.exists() ? snapshot.data() : {}) as Partial<SiteSettings>;
   return {
     siteTitle: data.siteTitle ?? "",
     siteDescription: data.siteDescription ?? "",
@@ -312,11 +273,10 @@ export async function getSettings(): Promise<SiteSettings> {
 export async function updateSettings(
   input: Partial<SiteSettings>
 ): Promise<SiteSettings> {
-  const db = getAdminDb();
-  const ref = db.collection("settings").doc("main");
-  const snapshot = await ref.get();
-  const current = snapshot.exists ? (snapshot.data() as SiteSettings) : ({} as SiteSettings);
+  const ref = doc(db, "settings", "main");
+  const snapshot = await getDoc(ref);
+  const current = snapshot.exists() ? (snapshot.data() as SiteSettings) : ({} as SiteSettings);
   const updated = { ...current, ...input };
-  await ref.set(updated);
+  await setDoc(ref, updated);
   return updated;
 }
