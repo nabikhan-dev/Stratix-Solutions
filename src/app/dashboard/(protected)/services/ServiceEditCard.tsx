@@ -1,13 +1,29 @@
 "use client";
 
-import { useActionState } from "react";
-import { Field, inputClass, scrollableInputClass, Card, FormError, textareaClass} from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
-import { updateServiceAction, type ServiceFormState } from "./actions";
+import { useState, useTransition } from "react";
+import { Field, inputClass, scrollableInputClass, Card, FormError, textareaClass } from "@/components/dashboard/ui";
+import { updateServiceAction } from "./actions";
 import type { PrimaryService } from "@/data/content";
 
 export default function ServiceEditCard({ service }: { service: PrimaryService }) {
-  const [state, formAction] = useActionState<ServiceFormState, FormData>(updateServiceAction, undefined);
+  const [error, setError] = useState<string | undefined>();
+  const [savedAt, setSavedAt] = useState<number | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    setSavedAt(undefined);
+    startTransition(async () => {
+      const result = await updateServiceAction(formData);
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.savedAt) {
+        setSavedAt(result.savedAt);
+      }
+    });
+  }
 
   return (
     <Card>
@@ -16,7 +32,7 @@ export default function ServiceEditCard({ service }: { service: PrimaryService }
         <h2 className="text-[15px] font-semibold text-primary">{service.title}</h2>
       </div>
 
-      <form action={formAction} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input type="hidden" name="id" value={service.id} />
 
         <Field label="Title" htmlFor={`title-${service.id}`}>
@@ -62,11 +78,17 @@ export default function ServiceEditCard({ service }: { service: PrimaryService }
           </label>
         </Field>
 
-        <FormError message={state?.error} />
+        <FormError message={error} />
 
         <div className="flex items-center gap-3">
-          <SubmitButton pendingLabel="Saving…">Save</SubmitButton>
-          {state?.savedAt && <p className="text-[13px] text-calm">Saved.</p>}
+          <button
+            type="submit"
+            disabled={isPending}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-signal px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPending ? "Saving…" : "Save"}
+          </button>
+          {!isPending && savedAt && <p className="text-[13px] text-calm">Saved.</p>}
         </div>
       </form>
     </Card>

@@ -1,20 +1,36 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import { Card, Field, inputClass, FormError, textareaClass, labelClass } from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
-import { updateSettingsAction, type SettingsFormState } from "./actions";
+import { updateSettingsAction } from "./actions";
 import type { SiteSettings } from "@/lib/dashboard/store";
 
 export default function SettingsForm({ settings }: { settings: SiteSettings }) {
-  const [state, formAction] = useActionState<SettingsFormState, FormData>(updateSettingsAction, undefined);
+  const [error, setError] = useState<string | undefined>();
+  const [savedAt, setSavedAt] = useState<number | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    setSavedAt(undefined);
+    startTransition(async () => {
+      const result = await updateSettingsAction(formData);
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.savedAt) {
+        setSavedAt(result.savedAt);
+      }
+    });
+  }
 
   return (
     <div className="flex flex-col gap-8">
       {/* ── Site metadata ───────────────────────────── */}
       <Card className="max-w-2xl">
         <h2 className="mb-5 text-[15px] font-semibold text-primary">Site metadata</h2>
-        <form action={formAction} className="flex flex-col gap-5" id="settings-form">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5" id="settings-form">
           <Field label="Site title" htmlFor="siteTitle" hint="Used as the default <title> and Open Graph title.">
             <input id="siteTitle" name="siteTitle" required defaultValue={settings.siteTitle} className={inputClass} />
           </Field>
@@ -106,11 +122,17 @@ export default function SettingsForm({ settings }: { settings: SiteSettings }) {
             </div>
           </div>
 
-          <FormError message={state?.error} />
+          <FormError message={error} />
 
           <div className="flex items-center gap-3">
-            <SubmitButton pendingLabel="Saving…">Save changes</SubmitButton>
-            {state?.savedAt && <p className="text-[13px] text-calm">Saved.</p>}
+            <button
+              type="submit"
+              disabled={isPending}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-signal px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isPending ? "Saving…" : "Save changes"}
+            </button>
+            {!isPending && savedAt && <p className="text-[13px] text-calm">Saved.</p>}
           </div>
         </form>
       </Card>

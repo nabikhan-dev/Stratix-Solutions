@@ -1,8 +1,5 @@
-"use server";
+// Client-side project mutations — no "use server", no Server Actions.
 
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/dashboard/session";
 import { createProject, deleteProject, updateProject } from "@/lib/dashboard/store";
 
 export type ProjectFormState = { error?: string } | undefined;
@@ -14,7 +11,7 @@ function linesToList(value: FormDataEntryValue | null): string[] {
     .filter(Boolean);
 }
 
-function readProjectFormData(formData: FormData) {
+export function readProjectFormData(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   if (!title) throw new Error("Title is required.");
@@ -44,46 +41,25 @@ function readProjectFormData(formData: FormData) {
   };
 }
 
-export async function createProjectAction(_prevState: ProjectFormState, formData: FormData): Promise<ProjectFormState> {
-  await requireSession();
-
-  let id: number;
+export async function createProjectAction(formData: FormData): Promise<{ error?: string; id?: number }> {
   try {
     const project = await createProject(readProjectFormData(formData));
-    id = project.id;
+    return { id: project.id };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't create the project." };
   }
-
-  revalidatePath("/dashboard/projects");
-  revalidatePath("/dashboard");
-  revalidatePath("/", "layout");
-  redirect(`/dashboard/projects/${id}`);
 }
 
-export async function updateProjectAction(_prevState: ProjectFormState, formData: FormData): Promise<ProjectFormState> {
-  await requireSession();
-
+export async function updateProjectAction(formData: FormData): Promise<{ error?: string }> {
   const id = Number(formData.get("id"));
   try {
     await updateProject(id, readProjectFormData(formData));
+    return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't save the project." };
   }
-
-  revalidatePath("/dashboard/projects");
-  revalidatePath(`/dashboard/projects/${id}`);
-  revalidatePath("/dashboard");
-  revalidatePath("/", "layout");
-  return { error: undefined };
 }
 
-export async function deleteProjectAction(formData: FormData) {
-  await requireSession();
-  const id = Number(formData.get("id"));
+export async function deleteProjectAction(id: number): Promise<void> {
   await deleteProject(id);
-  revalidatePath("/dashboard/projects");
-  revalidatePath("/dashboard");
-  revalidatePath("/", "layout");
-  redirect("/dashboard/projects");
 }

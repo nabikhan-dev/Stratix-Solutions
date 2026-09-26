@@ -1,10 +1,8 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
 import DashboardNav from "./DashboardNav";
-import SubmitButton from "./SubmitButton";
-import { logout } from "@/app/dashboard/actions";
+import LogoutButton from "./LogoutButton";
 
 export default function DashboardShell({ children }: { children: ReactNode }) {
   return (
@@ -51,15 +49,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
               >
                 View live site ↗
               </Link>
-              <form action={logout}>
-                <SubmitButton
-                  pendingLabel="Signing out…"
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-[14px] font-medium text-white/60 transition hover:bg-white/5 hover:text-white"
-                >
-                  <LogOut className="size-4" strokeWidth={1.75} />
-                  Log out
-                </SubmitButton>
-              </form>
+              <LogoutButton />
             </div>
           </div>
         </aside>

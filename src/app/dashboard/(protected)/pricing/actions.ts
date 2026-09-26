@@ -1,7 +1,5 @@
-"use server";
+// Client-side pricing mutations — no "use server", no Server Actions.
 
-import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/dashboard/session";
 import {
   updatePricingTier,
   createFeatureOption,
@@ -11,16 +9,14 @@ import {
 
 export type PricingFormState = { error?: string; savedAt?: number } | undefined;
 
-export async function updatePricingTierAction(_prevState: PricingFormState, formData: FormData): Promise<PricingFormState> {
-  await requireSession();
-
+export async function updatePricingTierAction(formData: FormData): Promise<PricingFormState> {
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const price = String(formData.get("price") ?? "").trim();
   const timeline = String(formData.get("timeline") ?? "").trim();
-  
+
   const features: string[] = [];
-  
+
   for (const [key, value] of formData.entries()) {
     if (key.startsWith("feature_enabled_") && value === "true") {
       const index = key.replace("feature_enabled_", "");
@@ -45,39 +41,21 @@ export async function updatePricingTierAction(_prevState: PricingFormState, form
     return { error: error instanceof Error ? error.message : "Couldn't save this tier." };
   }
 
-  revalidatePath("/", "layout");
   return { savedAt: Date.now() };
 }
 
-export async function updateFeatureOptionAction(formData: FormData) {
-  await requireSession();
-  const categoryId = String(formData.get("categoryId") ?? "");
-  const optionId = String(formData.get("optionId") ?? "");
-  const name = String(formData.get("name") ?? "").trim();
-  const price = Number(formData.get("price"));
-
+export async function updateFeatureOptionAction(categoryId: string, optionId: string, name: string, price: number): Promise<void> {
   if (categoryId && optionId && name && Number.isFinite(price)) {
     await updateFeatureOption(categoryId, optionId, { name, price });
   }
-  revalidatePath("/", "layout");
 }
 
-export async function createFeatureOptionAction(formData: FormData) {
-  await requireSession();
-  const categoryId = String(formData.get("categoryId") ?? "");
-  const name = String(formData.get("name") ?? "").trim();
-  const price = Number(formData.get("price"));
-
+export async function createFeatureOptionAction(categoryId: string, name: string, price: number): Promise<void> {
   if (categoryId && name && Number.isFinite(price)) {
     await createFeatureOption(categoryId, name, price);
   }
-  revalidatePath("/", "layout");
 }
 
-export async function deleteFeatureOptionAction(formData: FormData) {
-  await requireSession();
-  const categoryId = String(formData.get("categoryId") ?? "");
-  const optionId = String(formData.get("optionId") ?? "");
+export async function deleteFeatureOptionAction(categoryId: string, optionId: string): Promise<void> {
   await deleteFeatureOption(categoryId, optionId);
-  revalidatePath("/", "layout");
 }

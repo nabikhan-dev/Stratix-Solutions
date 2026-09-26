@@ -1,13 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState } from "react";
-import { login, type LoginState } from "../actions";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { loginAction } from "../actions";
 import { FormError } from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
 
 export default function DashboardLoginPage() {
-  const [state, action] = useActionState<LoginState, FormData>(login, undefined);
+  const [error, setError] = useState<string | undefined>();
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    startTransition(async () => {
+      const result = await loginAction(formData);
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        router.push("/dashboard");
+      }
+    });
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-dark px-4">
@@ -43,7 +59,7 @@ export default function DashboardLoginPage() {
           Internal admin area. Enter the shared dashboard password to continue.
         </p>
 
-        <form action={action} className="mt-6 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div>
             <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-white/60">
               Password
@@ -59,14 +75,15 @@ export default function DashboardLoginPage() {
             />
           </div>
 
-          <FormError message={state?.error} />
+          <FormError message={error} />
 
-          <SubmitButton
-            pendingLabel="Signing in…"
+          <button
+            type="submit"
+            disabled={isPending}
             className="w-full justify-center rounded-lg bg-signal px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Sign in
-          </SubmitButton>
+            {isPending ? "Signing in…" : "Sign in"}
+          </button>
         </form>
       </div>
     </div>

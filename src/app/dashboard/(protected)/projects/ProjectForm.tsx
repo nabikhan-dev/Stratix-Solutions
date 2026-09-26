@@ -1,34 +1,55 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Plus, X } from "lucide-react";
-import { Field, inputClass, FormError, buttonGhostClass, textareaClass} from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
+import { Field, inputClass, FormError, buttonGhostClass, textareaClass } from "@/components/dashboard/ui";
 import ImageUrlField from "@/components/dashboard/ImageUrlField";
 import CategoryCombobox from "@/components/dashboard/CategoryCombobox";
 import type { Project } from "@/data/projects";
-import type { ProjectFormState } from "./actions";
+import { createProjectAction, updateProjectAction } from "./actions";
 
 export default function ProjectForm({
   mode,
   project,
-  action,
   existingCategories = [],
 }: {
   mode: "create" | "edit";
   project?: Project;
   existingCategories?: string[];
-  action: (state: ProjectFormState, formData: FormData) => Promise<ProjectFormState>;
 }) {
-  const [state, formAction] = useActionState<ProjectFormState, FormData>(action, undefined);
+  const [error, setError] = useState<string | undefined>();
   const [galleryUrls, setGalleryUrls] = useState<string[]>(project?.gallery ?? [""]);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const addGalleryImage = () => setGalleryUrls([...galleryUrls, ""]);
   const removeGalleryImage = (index: number) => setGalleryUrls(galleryUrls.filter((_, i) => i !== index));
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    startTransition(async () => {
+      if (mode === "create") {
+        const result = await createProjectAction(formData);
+        if (result.error) {
+          setError(result.error);
+        } else {
+          router.push(`/dashboard/projects/${result.id}`);
+        }
+      } else {
+        const result = await updateProjectAction(formData);
+        if (result.error) {
+          setError(result.error);
+        }
+      }
+    });
+  }
+
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {mode === "edit" && project && <input type="hidden" name="id" value={project.id} />}
 
       <Field label="Title" htmlFor="title">
@@ -112,18 +133,22 @@ export default function ProjectForm({
         Light card (use dark text on this background)
       </label>
 
-      <FormError message={state?.error} />
+      <FormError message={error} />
 
       <div className="flex items-center gap-3">
-        <SubmitButton pendingLabel={mode === "create" ? "Creating…" : "Saving…"}>
-          {mode === "create" ? "Create project" : "Save changes"}
-        </SubmitButton>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-signal px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isPending ? (mode === "create" ? "Creating…" : "Saving…") : (mode === "create" ? "Create project" : "Save changes")}
+        </button>
         <Link href="/dashboard/projects" className={buttonGhostClass}>
           Cancel
         </Link>
       </div>
 
-      {mode === "edit" && state && !state.error && <p className="text-[13px] text-calm">Saved.</p>}
+      {mode === "edit" && !isPending && !error && <p className="text-[13px] text-calm">Saved.</p>}
     </form>
   );
 }

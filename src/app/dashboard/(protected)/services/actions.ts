@@ -1,14 +1,10 @@
-"use server";
+// Client-side services mutations — no "use server", no Server Actions.
 
-import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/dashboard/session";
 import { updateService } from "@/lib/dashboard/store";
 
 export type ServiceFormState = { error?: string; savedAt?: number } | undefined;
 
-export async function updateServiceAction(_prevState: ServiceFormState, formData: FormData): Promise<ServiceFormState> {
-  await requireSession();
-
+export async function updateServiceAction(formData: FormData): Promise<ServiceFormState> {
   const id = String(formData.get("id") ?? "");
   const title = String(formData.get("title") ?? "").trim();
   const short = String(formData.get("short") ?? "").trim();
@@ -29,7 +25,5 @@ export async function updateServiceAction(_prevState: ServiceFormState, formData
     return { error: error instanceof Error ? error.message : "Couldn't save this service." };
   }
 
-  // Revalidate entire site so public pages reflect the dashboard edits immediately.
-  revalidatePath("/", "layout");
   return { savedAt: Date.now() };
 }

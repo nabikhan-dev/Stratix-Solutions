@@ -1,11 +1,37 @@
+"use client";
+
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageHeader, Table, Th, Td, EmptyState, buttonPrimaryClass, buttonGhostClass } from "@/components/dashboard/ui";
-import DeleteForm from "@/components/dashboard/DeleteForm";
+import DeleteButton from "@/components/dashboard/DeleteButton";
 import { listProjects } from "@/lib/dashboard/store";
 import { deleteProjectAction } from "./actions";
+import type { Project } from "@/data/projects";
 
-export default async function DashboardProjectsListPage() {
-  const projects = await listProjects();
+export default function DashboardProjectsListPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [, startTransition] = useTransition();
+  const router = useRouter();
+
+  useEffect(() => {
+    listProjects().then((data) => {
+      setProjects(data);
+      setLoading(false);
+    });
+  }, []);
+
+  function handleDelete(id: number) {
+    setDeletingId(id);
+    startTransition(async () => {
+      await deleteProjectAction(id);
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+      setDeletingId(null);
+      router.refresh();
+    });
+  }
 
   return (
     <div>
@@ -19,7 +45,9 @@ export default async function DashboardProjectsListPage() {
         }
       />
 
-      {projects.length === 0 ? (
+      {loading ? (
+        <p className="py-12 text-center text-[13.5px] text-muted">Loading…</p>
+      ) : projects.length === 0 ? (
         <EmptyState
           title="No projects yet"
           action={
@@ -51,10 +79,10 @@ export default async function DashboardProjectsListPage() {
                     <Link href={`/dashboard/projects/${project.id}`} className={buttonGhostClass}>
                       Edit
                     </Link>
-                    <DeleteForm
-                      action={deleteProjectAction}
-                      hiddenFields={{ id: String(project.id) }}
+                    <DeleteButton
+                      onDelete={() => handleDelete(project.id)}
                       confirmMessage={`Delete "${project.title}"? This can't be undone.`}
+                      isPending={deletingId === project.id}
                     />
                   </div>
                 </Td>

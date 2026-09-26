@@ -1,11 +1,28 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/dashboard/ui";
 import { listPricingTiers, listFeatureCategories } from "@/lib/dashboard/store";
 import PricingTierCard from "./PricingTierCard";
 import CategoryEditor from "./CategoryEditor";
+import type { PricingTier } from "@/data/content";
+import type { PricingCategory } from "@/data/pricing";
 
-export default async function DashboardPricingPage() {
-  const tiers = await listPricingTiers();
-  const categories = await listFeatureCategories();
+export default function DashboardPricingPage() {
+  const [tiers, setTiers] = useState<PricingTier[]>([]);
+  const [categories, setCategories] = useState<PricingCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([listPricingTiers(), listFeatureCategories()]).then(([t, c]) => {
+      setTiers(t);
+      setCategories(c);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <p className="py-12 text-center text-[13.5px] text-muted">Loading…</p>;
+
   const allFeatures = Array.from(new Set(tiers.flatMap((t) => t.features)));
 
   return (

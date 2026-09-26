@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/dashboard/ui";
 import TestimonialForm from "../TestimonialForm";
-import { createTestimonialAction } from "../actions";
 
 export default function NewTestimonialPage() {
   return (
@@ -12,7 +11,7 @@ export default function NewTestimonialPage() {
         backLabel="Testimonials"
       />
       <div className="mt-8">
-        <TestimonialForm mode="create" action={createTestimonialAction} />
+        <TestimonialForm mode="create" />
       </div>
     </div>
   );

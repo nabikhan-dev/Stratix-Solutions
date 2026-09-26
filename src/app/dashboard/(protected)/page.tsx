@@ -1,16 +1,41 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Newspaper, Briefcase, Sparkles, CircleDollarSign, MessageSquare } from "lucide-react";
 import { PageHeader, StatCard, Card } from "@/components/dashboard/ui";
 import { listBlogPosts, listProjects, listServices, listTestimonials, listFeatureCategories } from "@/lib/dashboard/store";
 
-export default async function DashboardOverviewPage() {
-  const posts = await listBlogPosts();
-  const projects = await listProjects();
-  const services = await listServices();
-  const testimonials = await listTestimonials();
-  
-  const categories = await listFeatureCategories();
-  const totalOptions = categories.reduce((sum, c) => sum + c.options.length, 0);
+export default function DashboardOverviewPage() {
+  const [stats, setStats] = useState({
+    posts: [] as any[],
+    projects: 0,
+    services: 0,
+    testimonials: 0,
+    options: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      listBlogPosts(),
+      listProjects(),
+      listServices(),
+      listTestimonials(),
+      listFeatureCategories(),
+    ]).then(([posts, projects, services, testimonials, categories]) => {
+      setStats({
+        posts,
+        projects: projects.length,
+        services: services.length,
+        testimonials: testimonials.length,
+        options: categories.reduce((sum, c) => sum + c.options.length, 0),
+      });
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <p className="py-12 text-center text-[13.5px] text-muted">Loading…</p>;
 
   return (
     <div>
@@ -19,18 +44,13 @@ export default async function DashboardOverviewPage() {
         description="Manage every page's content from here — blog posts, portfolio projects, services, and pricing."
       />
 
-
-
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-        <StatCard label="Blog posts" value={posts.length} href="/dashboard/blog" accent="signal" icon={Newspaper} />
-        <StatCard label="Projects" value={projects.length} href="/dashboard/projects" accent="aurora" icon={Briefcase} />
-        <StatCard label="Testimonials" value={testimonials.length} href="/dashboard/testimonials" accent="signal" icon={MessageSquare} />
-        <StatCard label="Services" value={services.length} href="/dashboard/services" accent="amber" icon={Sparkles} />
-        <StatCard label="Pricing line items" value={totalOptions} href="/dashboard/pricing" accent="calm" icon={CircleDollarSign} />
+        <StatCard label="Blog posts" value={stats.posts.length} href="/dashboard/blog" accent="signal" icon={Newspaper} />
+        <StatCard label="Projects" value={stats.projects} href="/dashboard/projects" accent="aurora" icon={Briefcase} />
+        <StatCard label="Testimonials" value={stats.testimonials} href="/dashboard/testimonials" accent="signal" icon={MessageSquare} />
+        <StatCard label="Services" value={stats.services} href="/dashboard/services" accent="amber" icon={Sparkles} />
+        <StatCard label="Pricing line items" value={stats.options} href="/dashboard/pricing" accent="calm" icon={CircleDollarSign} />
       </div>
-
-
-
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Card>
@@ -52,11 +72,11 @@ export default async function DashboardOverviewPage() {
         </Card>
         <Card>
           <h2 className="text-[15px] font-semibold text-primary">Most recent post</h2>
-          {posts[0] ? (
+          {stats.posts[0] ? (
             <div className="mt-3">
-              <p className="text-[14px] font-medium text-primary">{posts[0].title}</p>
+              <p className="text-[14px] font-medium text-primary">{stats.posts[0].title}</p>
               <p className="mt-1 text-[13px] text-muted">
-                {posts[0].category} · {posts[0].date}
+                {stats.posts[0].category} · {stats.posts[0].date}
               </p>
             </div>
           ) : (

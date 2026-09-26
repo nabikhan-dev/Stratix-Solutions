@@ -1,12 +1,38 @@
+"use client";
+
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { PageHeader, Table, Th, Td, Badge, EmptyState, buttonPrimaryClass, buttonGhostClass } from "@/components/dashboard/ui";
-import DeleteForm from "@/components/dashboard/DeleteForm";
+import DeleteButton from "@/components/dashboard/DeleteButton";
 import { listBlogPosts } from "@/lib/dashboard/store";
 import { deleteBlogPostAction } from "./actions";
+import type { BlogPost } from "@/data/blog";
 
-export default async function DashboardBlogListPage() {
-  const posts = await listBlogPosts();
+export default function DashboardBlogListPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+  const router = useRouter();
+
+  useEffect(() => {
+    listBlogPosts().then((data) => {
+      setPosts(data);
+      setLoading(false);
+    });
+  }, []);
+
+  function handleDelete(slug: string) {
+    setDeletingSlug(slug);
+    startTransition(async () => {
+      await deleteBlogPostAction(slug);
+      setPosts((prev) => prev.filter((p) => p.slug !== slug));
+      setDeletingSlug(null);
+      router.refresh();
+    });
+  }
 
   return (
     <div>
@@ -20,7 +46,9 @@ export default async function DashboardBlogListPage() {
         }
       />
 
-      {posts.length === 0 ? (
+      {loading ? (
+        <p className="py-12 text-center text-[13.5px] text-muted">Loading…</p>
+      ) : posts.length === 0 ? (
         <EmptyState
           title="No blog posts yet"
           description="Create your first post to see it here."
@@ -45,7 +73,6 @@ export default async function DashboardBlogListPage() {
           <tbody>
             {posts.map((post) => (
               <tr key={post.slug} className="group">
-                {/* Cover + title + excerpt */}
                 <Td>
                   <div className="flex items-center gap-3 min-w-0">
                     {post.image && (
@@ -70,7 +97,6 @@ export default async function DashboardBlogListPage() {
 
                 <Td className="text-muted whitespace-nowrap">{post.category}</Td>
 
-                {/* Author */}
                 <Td>
                   <div className="min-w-0">
                     <p className="truncate text-[13px] text-primary max-w-[120px]">{post.author?.name}</p>
@@ -80,7 +106,6 @@ export default async function DashboardBlogListPage() {
 
                 <Td className="text-muted whitespace-nowrap text-[13px]">{post.date}</Td>
 
-                {/* Featured badge */}
                 <Td>{post.featured && <Badge tone="signal">Featured</Badge>}</Td>
 
                 <Td className="text-right">
@@ -88,10 +113,10 @@ export default async function DashboardBlogListPage() {
                     <Link href={`/dashboard/blog/${post.slug}`} className={buttonGhostClass}>
                       Edit
                     </Link>
-                    <DeleteForm
-                      action={deleteBlogPostAction}
-                      hiddenFields={{ slug: post.slug }}
+                    <DeleteButton
+                      onDelete={() => handleDelete(post.slug)}
                       confirmMessage={`Delete "${post.title}"? This can't be undone.`}
+                      isPending={deletingSlug === post.slug}
                     />
                   </div>
                 </Td>

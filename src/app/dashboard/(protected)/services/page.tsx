@@ -1,9 +1,23 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/dashboard/ui";
 import { listServices } from "@/lib/dashboard/store";
 import ServiceEditCard from "./ServiceEditCard";
+import type { PrimaryService } from "@/data/content";
 
-export default async function DashboardServicesPage() {
-  const services = await listServices();
+export default function DashboardServicesPage() {
+  const [services, setServices] = useState<PrimaryService[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    listServices().then((data) => {
+      setServices(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <p className="py-12 text-center text-[13.5px] text-muted">Loading…</p>;
 
   return (
     <div>

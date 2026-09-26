@@ -1,11 +1,49 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { inputClass, buttonGhostClass } from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
-import DeleteForm from "@/components/dashboard/DeleteForm";
+import DeleteButton from "@/components/dashboard/DeleteButton";
 import { updateFeatureOptionAction, createFeatureOptionAction, deleteFeatureOptionAction } from "./actions";
 import type { PricingCategory } from "@/data/pricing";
 
 export default function CategoryEditor({ category }: { category: PricingCategory }) {
+  const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
   const total = category.options.reduce((sum, o) => sum + o.price, 0);
+
+  async function handleUpdate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsPending(true);
+    const formData = new FormData(e.currentTarget);
+    const categoryId = String(formData.get("categoryId"));
+    const optionId = String(formData.get("optionId"));
+    const name = String(formData.get("name"));
+    const price = Number(formData.get("price"));
+    await updateFeatureOptionAction(categoryId, optionId, name, price);
+    setIsPending(false);
+    router.refresh();
+  }
+
+  async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsPending(true);
+    const formData = new FormData(e.currentTarget);
+    const categoryId = String(formData.get("categoryId"));
+    const name = String(formData.get("name"));
+    const price = Number(formData.get("price"));
+    await createFeatureOptionAction(categoryId, name, price);
+    (e.target as HTMLFormElement).reset();
+    setIsPending(false);
+    router.refresh();
+  }
+
+  async function handleDelete(categoryId: string, optionId: string) {
+    setIsPending(true);
+    await deleteFeatureOptionAction(categoryId, optionId);
+    setIsPending(false);
+    router.refresh();
+  }
 
   return (
     <details className="group rounded-2xl border border-line bg-surface open:pb-2">
@@ -19,12 +57,8 @@ export default function CategoryEditor({ category }: { category: PricingCategory
 
       <div className="flex flex-col gap-2 border-t border-line px-5 py-4">
         {category.options.map((option) => (
-          // Two sibling <form>s (not one nested inside the other — nested
-          // forms are invalid HTML and browsers will misattribute submits).
-          // The update form uses `contents` so its inputs still lay out as
-          // plain grid items alongside the separate delete form.
           <div key={option.id} className="grid grid-cols-[1fr_110px_auto_auto] items-center gap-2">
-            <form action={updateFeatureOptionAction} className="contents">
+            <form onSubmit={handleUpdate} className="contents">
               <input type="hidden" name="categoryId" value={category.id} />
               <input type="hidden" name="optionId" value={option.id} />
               <input
@@ -42,29 +76,29 @@ export default function CategoryEditor({ category }: { category: PricingCategory
                 aria-label={`Price for ${option.name}`}
                 className={`${inputClass} py-2`}
               />
-              <SubmitButton pendingLabel="…" className={`${buttonGhostClass} px-3! py-2!`}>
+              <button disabled={isPending} type="submit" className={`${buttonGhostClass} px-3! py-2!`}>
                 Save
-              </SubmitButton>
+              </button>
             </form>
-            <DeleteForm
-              action={deleteFeatureOptionAction}
-              hiddenFields={{ categoryId: category.id, optionId: option.id }}
+            <DeleteButton
+              onDelete={() => handleDelete(category.id, option.id)}
               confirmMessage={`Remove "${option.name}"?`}
               label="Remove"
+              isPending={isPending}
             />
           </div>
         ))}
 
         <form
-          action={createFeatureOptionAction}
+          onSubmit={handleCreate}
           className="mt-2 grid grid-cols-[1fr_110px_auto] items-center gap-2 border-t border-line pt-3"
         >
           <input type="hidden" name="categoryId" value={category.id} />
-          <input name="name" placeholder="New line item name" className={`${inputClass} py-2`} />
-          <input name="price" type="number" min={0} step={1} placeholder="Price" className={`${inputClass} py-2`} />
-          <SubmitButton pendingLabel="Adding…" className={`${buttonGhostClass} px-3! py-2!`}>
+          <input name="name" placeholder="New line item name" className={`${inputClass} py-2`} required />
+          <input name="price" type="number" min={0} step={1} placeholder="Price" className={`${inputClass} py-2`} required />
+          <button disabled={isPending} type="submit" className={`${buttonGhostClass} px-3! py-2!`}>
             + Add
-          </SubmitButton>
+          </button>
         </form>
       </div>
     </details>

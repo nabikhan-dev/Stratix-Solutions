@@ -1,35 +1,56 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState, useTransition } from "react";
 import { Plus, X } from "lucide-react";
-import { Field, inputClass, scrollableInputClass, FormError, buttonGhostClass, textareaClass} from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
+import { useRouter } from "next/navigation";
+import { Field, inputClass, scrollableInputClass, FormError, buttonGhostClass, textareaClass } from "@/components/dashboard/ui";
 import ImageUrlField from "@/components/dashboard/ImageUrlField";
 import CategoryCombobox from "@/components/dashboard/CategoryCombobox";
 import { serializeSections } from "@/lib/dashboard/sections";
 import { type BlogPost } from "@/data/blog";
 import Link from "next/link";
-import type { BlogFormState } from "./actions";
+import { createBlogPostAction, updateBlogPostAction } from "./actions";
 
 export default function BlogForm({
   mode,
   post,
-  action,
   existingCategories = [],
 }: {
   mode: "create" | "edit";
   post?: BlogPost;
   existingCategories?: string[];
-  action: (state: BlogFormState, formData: FormData) => Promise<BlogFormState>;
 }) {
-  const [state, formAction] = useActionState<BlogFormState, FormData>(action, undefined);
+  const [error, setError] = useState<string | undefined>();
   const [galleryUrls, setGalleryUrls] = useState<string[]>(post?.gallery ?? [""]);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const addGalleryImage = () => setGalleryUrls([...galleryUrls, ""]);
   const removeGalleryImage = (index: number) => setGalleryUrls(galleryUrls.filter((_, i) => i !== index));
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    startTransition(async () => {
+      if (mode === "create") {
+        const result = await createBlogPostAction(formData);
+        if (result.error) {
+          setError(result.error);
+        } else {
+          router.push(`/dashboard/blog/${result.slug}`);
+        }
+      } else {
+        const result = await updateBlogPostAction(formData);
+        if (result.error) {
+          setError(result.error);
+        }
+      }
+    });
+  }
+
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {mode === "edit" && post && <input type="hidden" name="slug" value={post.slug} />}
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -90,8 +111,6 @@ export default function BlogForm({
         </button>
       </div>
 
-
-
       <Field label="Excerpt" htmlFor="excerpt">
         <textarea id="excerpt" name="excerpt" required rows={2} defaultValue={post?.excerpt} className={textareaClass} data-lenis-prevent="true" />
       </Field>
@@ -126,18 +145,22 @@ export default function BlogForm({
         />
       </Field>
 
-      <FormError message={state?.error} />
+      <FormError message={error} />
 
       <div className="flex items-center gap-3">
-        <SubmitButton pendingLabel={mode === "create" ? "Creating…" : "Saving…"}>
-          {mode === "create" ? "Create post" : "Save changes"}
-        </SubmitButton>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-signal px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isPending ? (mode === "create" ? "Creating…" : "Saving…") : (mode === "create" ? "Create post" : "Save changes")}
+        </button>
         <Link href="/dashboard/blog" className={buttonGhostClass}>
           Cancel
         </Link>
       </div>
 
-      {mode === "edit" && state && !state.error && (
+      {mode === "edit" && !isPending && !error && (
         <p className="text-[13px] text-calm">Saved.</p>
       )}
     </form>

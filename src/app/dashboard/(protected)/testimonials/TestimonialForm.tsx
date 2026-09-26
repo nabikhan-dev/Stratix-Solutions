@@ -1,26 +1,47 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Field, inputClass, FormError, buttonGhostClass, textareaClass} from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
+import { useRouter } from "next/navigation";
+import { Field, inputClass, FormError, buttonGhostClass, textareaClass } from "@/components/dashboard/ui";
 import ImageUrlField from "@/components/dashboard/ImageUrlField";
 import type { Testimonial } from "@/data/testimonials";
-import type { TestimonialFormState } from "./actions";
+import { createTestimonialAction, updateTestimonialAction } from "./actions";
 
 export default function TestimonialForm({
   mode,
   testimonial,
-  action,
 }: {
   mode: "create" | "edit";
   testimonial?: Testimonial;
-  action: (state: TestimonialFormState, formData: FormData) => Promise<TestimonialFormState>;
 }) {
-  const [state, formAction] = useActionState<TestimonialFormState, FormData>(action, undefined);
+  const [error, setError] = useState<string | undefined>();
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    startTransition(async () => {
+      if (mode === "create") {
+        const result = await createTestimonialAction(formData);
+        if (result.error) {
+          setError(result.error);
+        } else {
+          router.push(`/dashboard/testimonials/${result.id}`);
+        }
+      } else {
+        const result = await updateTestimonialAction(formData);
+        if (result.error) {
+          setError(result.error);
+        }
+      }
+    });
+  }
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {mode === "edit" && testimonial && <input type="hidden" name="id" value={testimonial.id} />}
 
       <Field label="Author" htmlFor="author">
@@ -37,18 +58,22 @@ export default function TestimonialForm({
 
       <ImageUrlField id="avatar" name="avatar" label="Avatar URL" defaultValue={testimonial?.avatar} required />
 
-      <FormError message={state?.error} />
+      <FormError message={error} />
 
       <div className="flex items-center gap-3">
-        <SubmitButton pendingLabel={mode === "create" ? "Creating…" : "Saving…"}>
-          {mode === "create" ? "Create testimonial" : "Save changes"}
-        </SubmitButton>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-signal px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isPending ? (mode === "create" ? "Creating…" : "Saving…") : (mode === "create" ? "Create testimonial" : "Save changes")}
+        </button>
         <Link href="/dashboard/testimonials" className={buttonGhostClass}>
           Cancel
         </Link>
       </div>
 
-      {mode === "edit" && state && !state.error && <p className="text-[13px] text-calm">Saved.</p>}
+      {mode === "edit" && !isPending && !error && <p className="text-[13px] text-calm">Saved.</p>}
     </form>
   );
 }

@@ -1,17 +1,33 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import { Field, inputClass, Card, FormError } from "@/components/dashboard/ui";
-import SubmitButton from "@/components/dashboard/SubmitButton";
-import { updatePricingTierAction, type PricingFormState } from "./actions";
+import { updatePricingTierAction } from "./actions";
 import type { PricingTier } from "@/data/content";
 
 export default function PricingTierCard({ tier, allFeatures }: { tier: PricingTier; allFeatures: string[] }) {
-  const [state, formAction] = useActionState<PricingFormState, FormData>(updatePricingTierAction, undefined);
+  const [error, setError] = useState<string | undefined>();
+  const [savedAt, setSavedAt] = useState<number | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setError(undefined);
+    setSavedAt(undefined);
+    startTransition(async () => {
+      const result = await updatePricingTierAction(formData);
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.savedAt) {
+        setSavedAt(result.savedAt);
+      }
+    });
+  }
 
   return (
     <Card>
-      <form action={formAction} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input type="hidden" name="id" value={tier.id} />
 
         <Field label="Package name" htmlFor={`name-${tier.id}`}>
@@ -58,11 +74,17 @@ export default function PricingTierCard({ tier, allFeatures }: { tier: PricingTi
           </div>
         </Field>
 
-        <FormError message={state?.error} />
+        <FormError message={error} />
 
         <div className="flex items-center gap-3">
-          <SubmitButton pendingLabel="Saving…">Save</SubmitButton>
-          {state?.savedAt && <p className="text-[13px] text-calm">Saved.</p>}
+          <button
+            type="submit"
+            disabled={isPending}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-signal px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPending ? "Saving…" : "Save"}
+          </button>
+          {!isPending && savedAt && <p className="text-[13px] text-calm">Saved.</p>}
         </div>
       </form>
     </Card>

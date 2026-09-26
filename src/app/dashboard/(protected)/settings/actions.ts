@@ -1,14 +1,10 @@
-"use server";
+// Client-side settings mutations — no "use server", no Server Actions.
 
-import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/dashboard/session";
 import { updateSettings } from "@/lib/dashboard/store";
 
 export type SettingsFormState = { error?: string; savedAt?: number } | undefined;
 
-export async function updateSettingsAction(_prevState: SettingsFormState, formData: FormData): Promise<SettingsFormState> {
-  await requireSession();
-
+export async function updateSettingsAction(formData: FormData): Promise<SettingsFormState> {
   const siteTitle = String(formData.get("siteTitle") ?? "").trim();
   const siteDescription = String(formData.get("siteDescription") ?? "").trim();
   const contactEmail = String(formData.get("contactEmail") ?? "").trim();
@@ -25,7 +21,6 @@ export async function updateSettingsAction(_prevState: SettingsFormState, formDa
     responseTime: String(formData.get("responseTime") ?? "").trim(),
     serving: String(formData.get("serving") ?? "").trim(),
     contactNote: String(formData.get("contactNote") ?? "").trim(),
-    // About page stats
     stat1Label: String(formData.get("stat1Label") ?? "").trim(),
     stat1Value: String(formData.get("stat1Value") ?? "").trim(),
     stat1Desc:  String(formData.get("stat1Desc")  ?? "").trim(),
@@ -37,7 +32,5 @@ export async function updateSettingsAction(_prevState: SettingsFormState, formDa
     stat3Desc:  String(formData.get("stat3Desc")  ?? "").trim(),
   });
 
-  revalidatePath("/dashboard/settings");
-  revalidatePath("/about");
   return { savedAt: Date.now() };
 }

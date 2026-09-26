@@ -1,8 +1,6 @@
-"use server";
+// Client-side blog mutations — no "use server", no Server Actions.
+// All Firestore writes go through the client SDK in store.ts.
 
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/dashboard/session";
 import { createBlogPost, deleteBlogPost, updateBlogPost } from "@/lib/dashboard/store";
 import { parseSections } from "@/lib/dashboard/sections";
 import { type BlogCategory } from "@/data/blog";
@@ -15,7 +13,7 @@ function calcReadTime(text: string): string {
   return `${minutes} min read`;
 }
 
-function readBlogFormData(formData: FormData) {
+export function readBlogFormData(formData: FormData) {
   const category = String(formData.get("category") ?? "").trim();
   if (!category) throw new Error("Category is required.");
 
@@ -27,7 +25,6 @@ function readBlogFormData(formData: FormData) {
   const sectionsRaw = String(formData.get("sections") ?? "");
   const sections = parseSections(sectionsRaw);
 
-  // Auto-calculate read time from all text content
   const allText = [excerpt, ...sections.map((s) => [s.heading ?? "", s.body].join(" "))].join(" ");
   const readTime = calcReadTime(allText);
 
@@ -48,49 +45,28 @@ function readBlogFormData(formData: FormData) {
   };
 }
 
-export async function createBlogPostAction(_prevState: BlogFormState, formData: FormData): Promise<BlogFormState> {
-  await requireSession();
-
-  let slug: string;
+export async function createBlogPostAction(formData: FormData): Promise<{ error?: string; slug?: string }> {
   try {
     const input = readBlogFormData(formData);
     const requestedSlug = String(formData.get("slug") ?? "").trim();
     const post = await createBlogPost({ ...input, slug: requestedSlug || undefined });
-    slug = post.slug;
+    return { slug: post.slug };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't create the post." };
   }
-
-  revalidatePath("/dashboard/blog");
-  revalidatePath("/dashboard");
-  revalidatePath("/", "layout");
-  redirect(`/dashboard/blog/${slug}`);
 }
 
-export async function updateBlogPostAction(_prevState: BlogFormState, formData: FormData): Promise<BlogFormState> {
-  await requireSession();
-
+export async function updateBlogPostAction(formData: FormData): Promise<{ error?: string }> {
   const slug = String(formData.get("slug") ?? "");
   try {
     const input = readBlogFormData(formData);
     await updateBlogPost(slug, input);
+    return {};
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Couldn't save the post." };
   }
-
-  revalidatePath("/dashboard/blog");
-  revalidatePath(`/dashboard/blog/${slug}`);
-  revalidatePath("/dashboard");
-  revalidatePath("/", "layout");
-  return { error: undefined };
 }
 
-export async function deleteBlogPostAction(formData: FormData) {
-  await requireSession();
-  const slug = String(formData.get("slug") ?? "");
+export async function deleteBlogPostAction(slug: string): Promise<void> {
   await deleteBlogPost(slug);
-  revalidatePath("/dashboard/blog");
-  revalidatePath("/dashboard");
-  revalidatePath("/", "layout");
-  redirect("/dashboard/blog");
 }
