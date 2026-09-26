@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
+  basePath: "/Stratix-Solutions",
+  assetPrefix: "/Stratix-Solutions",
   images: {
+    unoptimized: true, // Required for output:"export" — Next.js image optimization needs a server
     // The dashboard lets an admin paste any image URL for blog/project
     // covers — there's no fixed set of hosts to allow-list anymore, so
     // this accepts any HTTPS host instead of only images.unsplash.com.
