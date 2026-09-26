@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { loginAction } from "../actions";
 import { FormError } from "@/components/dashboard/ui";
+import { publicPath } from "@/lib/public-path";
 
 export default function DashboardLoginPage() {
   const [error, setError] = useState<string | undefined>();
@@ -47,7 +48,7 @@ export default function DashboardLoginPage() {
 
       <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-white/3 p-8 backdrop-blur-xl">
         <Image
-          src="/logo-white.png"
+          src={publicPath("/logo-white.png")}
           alt="Stratix Solutions"
           width={1331}
           height={177}

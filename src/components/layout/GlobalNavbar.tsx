@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { publicPath } from "@/lib/public-path";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { hero, nav } from "@/data/content";
@@ -77,7 +78,7 @@ export default function GlobalNavbar() {
             <Link ref={logoRef} href="/" className="z-10 flex shrink-0 items-center">
               <span className="relative block h-5 aspect-[1331/177] sm:h-7">
                 <Image
-                  src="/logo-white.png"
+                  src={publicPath("/logo-white.png")}
                   alt="Stratix Solutions"
                   fill
                   sizes="(min-width: 640px) 211px, 150px"
@@ -87,7 +88,7 @@ export default function GlobalNavbar() {
                   }`}
                 />
                 <Image
-                  src="/logo-black.png"
+                  src={publicPath("/logo-black.png")}
                   alt=""
                   aria-hidden="true"
                   fill

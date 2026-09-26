@@ -3,6 +3,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { RISE, STAGGER, VIEWPORT, enter } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 import { sections } from "@/data/copy";
 import { testimonials } from "@/data/testimonials";
 
@@ -85,7 +86,7 @@ export default function TestimonialsSection({ dark = false }: { dark?: boolean }
               <div className="flex items-center gap-3.5 mt-auto pt-1">
                 <div className={`relative w-10 h-10 rounded-full overflow-hidden border ${line}`}>
                   <Image
-                    src={testimonial.avatar}
+                    src={publicPath(testimonial.avatar)}
                     alt={testimonial.author}
                     fill
                     sizes="40px"

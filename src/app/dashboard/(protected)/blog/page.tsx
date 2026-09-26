@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { PageHeader, Table, Th, Td, Badge, EmptyState, buttonPrimaryClass, buttonGhostClass } from "@/components/dashboard/ui";
 import DeleteButton from "@/components/dashboard/DeleteButton";
 import { listBlogPosts } from "@/lib/dashboard/store";
+import { publicPath } from "@/lib/public-path";
 import { deleteBlogPostAction } from "./actions";
 import type { BlogPost } from "@/data/blog";
 
@@ -78,7 +79,7 @@ export default function DashboardBlogListPage() {
                     {post.image && (
                       <div className="relative size-10 shrink-0 overflow-hidden rounded-lg border border-line bg-deep">
                         <Image
-                          src={post.image}
+                          src={publicPath(post.image)}
                           alt={post.title}
                           fill
                           className="object-cover"

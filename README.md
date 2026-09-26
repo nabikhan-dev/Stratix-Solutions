@@ -53,8 +53,6 @@ Run `npm run lint` and `npm run build` before shipping changes.
 Nothing here uses fake stock photography or invented logos, but a few real
 assets will make the site feel finished:
 
-- **Open Graph image** — `public/og-image.png` (1200×630). Referenced in
-  `src/app/layout.tsx` metadata but not yet created.
 - **Brand mark** — add a real Stratix Solutions logo/mark when available.
 - **Service visuals** — the current service visuals use abstract SVG/CSS
   treatments. Replace them with real screenshots or case-study visuals when

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Twitter, Linkedin, Github } from "../SocialIcons";
+import { publicPath } from "@/lib/public-path";
 
 export default function AgencyFooter() {
   const links = {
@@ -32,7 +33,7 @@ export default function AgencyFooter() {
           <div data-reveal-stagger-child className="lg:col-span-5">
             <Link href="/" className="inline-block">
               <Image
-                src="/logo-white.png"
+                src={publicPath("/logo-white.png")}
                 alt="Stratix Solutions"
                 width={1331}
                 height={177}

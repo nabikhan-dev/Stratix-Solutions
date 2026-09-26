@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DashboardNav from "./DashboardNav";
 import LogoutButton from "./LogoutButton";
+import { publicPath } from "@/lib/public-path";
 
 export default function DashboardShell({ children }: { children: ReactNode }) {
   return (
@@ -29,7 +30,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
 
           <Link href="/dashboard" className="relative z-10 mb-8 flex flex-col gap-2 px-2">
             <Image
-              src="/logo-white.png"
+              src={publicPath("/logo-white.png")}
               alt="Stratix Solutions"
               width={1331}
               height={177}

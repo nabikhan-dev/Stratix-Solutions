@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { type Project } from "@/data/projects";
 import { RISE, VIEWPORT, enterAt } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 
 export default function WorkPortfolio({ projects }: { projects: Project[] }) {
   const [activeCategory, setActiveCategory] = useState<string>("All Projects");
@@ -81,7 +81,7 @@ export default function WorkPortfolio({ projects }: { projects: Project[] }) {
                     )}
 
                     <img
-                      src={project.image}
+                      src={publicPath(project.image)}
                       alt={project.title}
                       className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />

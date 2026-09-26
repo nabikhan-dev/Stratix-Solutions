@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { ImageOff, Upload, Loader2 } from "lucide-react";
 import { Field, inputClass } from "./ui";
+import { publicPath } from "@/lib/public-path";
 
 /**
  * An image field for the dashboard: paste a URL, or upload a file from
@@ -94,7 +95,7 @@ export default function ImageUrlField({
         <div className="grid size-10.5 shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-deep">
           {trimmed && !broken ? (
             // eslint-disable-next-line @next/next/no-img-element -- arbitrary external/uploaded URLs; next/image optimization isn't the point of a small live preview thumbnail
-            <img src={trimmed} alt="" className="size-full object-cover" onError={() => setBroken(true)} />
+            <img src={publicPath(trimmed)} alt="" className="size-full object-cover" onError={() => setBroken(true)} />
           ) : (
             <ImageOff className="size-4 text-faint" strokeWidth={1.75} />
           )}

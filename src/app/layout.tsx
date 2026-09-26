@@ -9,13 +9,14 @@ import RouteVisible from "@/components/layout/RouteVisible";
 import MotionProvider from "@/components/motion/MotionProvider";
 import PageTransition from "@/components/motion/PageTransition";
 import RevealScroll from "@/components/motion/RevealScroll";
+import { publicPath } from "@/lib/public-path";
 
 // Fonts are loaded via <link> tags below (not next/font) so the build does
 // not depend on reaching fonts.googleapis.com at build time. Falls back to
 // the system stack defined in globals.css if the request is ever blocked.
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://stratixsolutions.com"),
+  metadataBase: new URL("https://nabikhan-dev.github.io"),
   title: {
     default: "Stratix Solutions — AI, UI/UX, app, and web development",
     template: "%s — Stratix Solutions",
@@ -23,18 +24,17 @@ export const metadata: Metadata = {
   description:
     "AI development, UI/UX design, app development, and responsive web development services. Strategy, design, engineering, QA, release, and support handled by one focused team.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/logo.png",
+    icon: publicPath("/favicon.ico"),
+    shortcut: publicPath("/favicon.ico"),
+    apple: publicPath("/logo.png"),
   },
   openGraph: {
     title: "Stratix Solutions — AI, UI/UX, app, and web development",
     description:
       "AI tools, product interfaces, mobile apps, and responsive web platforms built by one focused technical team.",
-    url: "https://stratixsolutions.com",
+    url: "https://nabikhan-dev.github.io/Stratix-Solutions/",
     siteName: "Stratix Solutions",
-    // TODO: replace with a real Open Graph image at /public/og-image.png (1200x630)
-    images: ["/og-image.png"],
+    images: [publicPath("/logo.png")],
     type: "website",
   },
   twitter: {

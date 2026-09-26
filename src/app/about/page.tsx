@@ -7,6 +7,7 @@ import CinematicHeading from "@/components/layout/CinematicHeading";
 import CountUp from "@/components/motion/CountUp";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 import { aboutPage, pageHeroes } from "@/data/copy";
 import { getSettings } from "@/lib/public-store";
 
@@ -69,7 +70,7 @@ export default async function AboutPage() {
           <div className="flex flex-col md:flex-row-reverse gap-12 lg:gap-20 items-center">
             <Reveal className="w-full md:w-5/12 aspect-[4/3] relative rounded-2xl overflow-hidden border border-line">
               <Image
-                src={aboutPage.mission.image}
+                src={publicPath(aboutPage.mission.image)}
                 alt={aboutPage.mission.imageAlt}
                 fill
                 sizes="(min-width: 768px) 42vw, 100vw"
@@ -120,7 +121,7 @@ export default async function AboutPage() {
                   }`}
                 >
                   <Image
-                    src={feature.image}
+                    src={publicPath(feature.image)}
                     alt={feature.imageAlt}
                     fill
                     sizes="(min-width: 768px) 42vw, 100vw"

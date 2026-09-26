@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
 import ViewBadge from "@/components/blog/ViewBadge";
+import { publicPath } from "@/lib/public-path";
 import { type BlogFilter, type BlogPost } from "@/data/blog";
 import { RISE, VIEWPORT, enter, enterAt } from "@/lib/motion";
 import { sections } from "@/data/copy";
@@ -84,7 +84,7 @@ export default function BlogExplorer({ blogPosts }: { blogPosts: BlogPost[] }) {
           >
             <div className="relative min-h-[320px] lg:min-h-0">
               <img
-                src={featured.image}
+                src={publicPath(featured.image)}
                 alt={featured.title}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
@@ -142,7 +142,7 @@ export default function BlogExplorer({ blogPosts }: { blogPosts: BlogPost[] }) {
                     {post.category}
                   </span>
                   <img
-                    src={post.image}
+                    src={publicPath(post.image)}
                     alt={post.title}
                     className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                   />

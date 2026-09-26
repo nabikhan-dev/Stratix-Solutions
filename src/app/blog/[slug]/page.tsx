@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 import ViewBadge from "@/components/blog/ViewBadge";
 import { listBlogPosts, getBlogPost } from "@/lib/public-store";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 import ClosingCta from "@/components/layout/ClosingCta";
 
 export async function generateStaticParams() {
@@ -30,7 +30,7 @@ export async function generateMetadata({
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      images: [post.image],
+      images: [publicPath(post.image)],
       type: "article",
     },
   };
@@ -110,7 +110,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <Reveal delay={0.25}>
         <div className="container-px mx-auto mt-12 w-full max-w-[1440px]">
           <div className="relative overflow-hidden rounded-[32px] border border-line shadow-xl">
-            <img src={post.image} alt={post.title} className="block w-full h-auto" />
+            <img src={publicPath(post.image)} alt={post.title} className="block w-full h-auto" />
           </div>
         </div>
       </Reveal>
@@ -125,7 +125,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 className="group relative overflow-hidden rounded-[20px] border border-line"
               >
                 <img
-                  src={img}
+                  src={publicPath(img)}
                   alt={`${post.title} gallery image ${idx + 1}`}
                   className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                 />
@@ -154,7 +154,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         className="group relative overflow-hidden rounded-[20px] border border-line"
                       >
                         <img
-                          src={img}
+                          src={publicPath(img)}
                           alt={`${section.heading || post.title} image ${imgIdx + 1}`}
                           className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                         />
@@ -187,7 +187,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Link href={`/blog/${p.slug}`} className="group flex flex-col">
                   <div className="relative mb-4 w-full overflow-hidden rounded-[20px] border border-line">
                     <img
-                      src={p.image}
+                      src={publicPath(p.image)}
                       alt={p.title}
                       className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                     />

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { type Project } from "@/data/projects";
 import SectionCtaButton from "@/components/layout/SectionCtaButton";
 import { RISE, STAGGER, VIEWPORT, enter, enterAt } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 import { sections } from "@/data/copy";
 
 export default function ProjectsPortfolio({ projects }: { projects: Project[] }) {
@@ -113,7 +113,7 @@ export default function ProjectsPortfolio({ projects }: { projects: Project[] })
                     className={`relative w-full rounded-[32px] overflow-hidden border border-line ${project.bg} mb-6`}
                   >
                     <img
-                      src={project.image}
+                      src={publicPath(project.image)}
                       alt={project.title}
                       className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     />

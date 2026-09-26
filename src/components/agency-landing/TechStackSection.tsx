@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { RISE, STAGGER, VIEWPORT, enter } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 import { sections } from "@/data/copy";
 
 type Tech = {
@@ -66,7 +67,7 @@ function TechPill({ name, icon, ai, invert }: Tech) {
       }}
     >
       <Image
-        src={icon}
+        src={publicPath(icon)}
         alt=""
         width={20}
         height={20}

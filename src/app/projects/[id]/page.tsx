@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CircleCheckBig, ArrowUpRight } from "lucide-react";
 import { listProjects, getProject } from "@/lib/public-store";
 import Reveal from "@/components/motion/Reveal";
 import { STAGGER } from "@/lib/motion";
+import { publicPath } from "@/lib/public-path";
 
 export async function generateStaticParams() {
   const projects = await listProjects();
@@ -93,7 +93,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
         <div className="container-px mx-auto mt-12 w-full max-w-[1440px]">
           <div className="relative overflow-hidden rounded-[32px] border border-line shadow-xl">
             <img
-              src={project.image}
+              src={publicPath(project.image)}
               alt={project.title}
               className="block w-full h-auto"
             />
@@ -111,7 +111,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
                 className="group relative overflow-hidden rounded-[20px] border border-line"
               >
                 <img
-                  src={img}
+                  src={publicPath(img)}
                   alt={`${project.title} gallery image ${idx + 1}`}
                   className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-105"
                 />
